@@ -11228,7 +11228,7 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
         widthGrow: 1
       },
       {
-        title: "Strike price",
+        title: "Strike<br>price",
         field: "strike_price",
         hozAlign: "left",
         headerHozAlign: "left",
@@ -11254,7 +11254,7 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
         field: "accounting_quantity",
         hozAlign: "right",
         headerHozAlign: "right",
-        widthGrow: 1.5,
+        widthGrow: 1,
         formatter: "money",
         formatterParams: {
           decimal: ".",
@@ -11328,11 +11328,11 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
         }
       },
       {
-        title: "Break even price",
+        title: "Break even<br>price",
         field: "computed_be_price",
         hozAlign: "right",
         headerHozAlign: "right",
-        widthGrow: 1.5,
+        widthGrow: 1,
         formatter: (h) => {
           const d = h.getValue();
           return d != null ? "$" + Number(d).toFixed(2) : "";
@@ -11384,7 +11384,7 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-86bc3b99"]]);
+}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-2dd39a47"]]);
 export {
   yn as callPositions,
   yn as default

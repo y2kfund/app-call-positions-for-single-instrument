@@ -51,7 +51,7 @@ const columns: ColumnDefinition[] = [
     widthGrow: 1
   },
   { 
-    title: 'Strike price', 
+    title: 'Strike<br>price', 
     field: 'strike_price', 
     hozAlign: 'left', 
     headerHozAlign: 'left',
@@ -85,7 +85,7 @@ const columns: ColumnDefinition[] = [
     field: 'accounting_quantity', 
     hozAlign: 'right', 
     headerHozAlign: 'right',
-    widthGrow: 1.5,
+    widthGrow: 1,
     formatter: 'money',
     formatterParams: {
       decimal: '.',
@@ -170,11 +170,11 @@ const columns: ColumnDefinition[] = [
     }
   },
   { 
-    title: 'Break even price', 
+    title: 'Break even<br>price', 
     field: 'computed_be_price', 
     hozAlign: 'right', 
     headerHozAlign: 'right',
-    widthGrow: 1.5,
+    widthGrow: 1,
     formatter: (cell: any) => {
       const value = cell.getValue()
       return value != null ? '$' + Number(value).toFixed(2) : ''

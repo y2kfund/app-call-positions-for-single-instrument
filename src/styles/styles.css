@@ -45,5 +45,5 @@
 }
 
 .tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title {
-  margin-right: 0 !important;
+  padding-right: 0 !important;
 }
