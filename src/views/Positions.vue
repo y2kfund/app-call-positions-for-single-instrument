@@ -10,10 +10,10 @@ interface callPositionsProps {
 }
 
 const props = withDefaults(defineProps<callPositionsProps>(), {
-  //symbolRoot: 'META',
-  //userId: '67e578fd-2cf7-48a4-b028-a11a3f89bb9b'
-  userId: null,
-  symbolRoot: ''
+  symbolRoot: 'META',
+  userId: '67e578fd-2cf7-48a4-b028-a11a3f89bb9b'
+  //userId: null,
+  //symbolRoot: ''
 })
 
 // Query call positions
@@ -84,6 +84,18 @@ const columns: ColumnDefinition[] = [
       precision: 0
     }
   },
+  {
+    title: 'Premium received per unit when the option was sold', 
+    field: 'avgPrice', 
+    minWidth: 100, 
+    hozAlign: 'right',
+    formatter: (cell: any) => {
+      const value = cell.getValue()
+      if (value == null) return ''
+      const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
+      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+    },
+  },
   { 
     title: 'Market Value', 
     field: 'market_value', 
@@ -141,7 +153,7 @@ const columns: ColumnDefinition[] = [
       return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
     }
   },
-  { title: 'BE Price', field: 'computed_be_price', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right',
+  { title: 'Break even price', field: 'computed_be_price', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right',
     formatter: (cell: any) => {
       const value = cell.getValue()
       return value != null ? '$' + Number(value).toFixed(2) : ''
