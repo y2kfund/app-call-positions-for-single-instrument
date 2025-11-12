@@ -1,15 +1,15 @@
 var kt = Object.defineProperty;
 var Mt = (l, e, t) => e in l ? kt(l, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : l[e] = t;
 var v = (l, e, t) => Mt(l, typeof e != "symbol" ? e + "" : e, t);
-import { inject as Lt, ref as he, watch as qe, nextTick as ve, onBeforeUnmount as tt, defineComponent as St, onMounted as Dt, createElementBlock as ee, openBlock as te, createElementVNode as X, createCommentVNode as Ye, toDisplayString as me, unref as J, createTextVNode as zt } from "vue";
+import { inject as Lt, ref as he, watch as qe, nextTick as ve, onBeforeUnmount as tt, defineComponent as St, onMounted as Dt, createElementBlock as ee, openBlock as te, createElementVNode as J, createCommentVNode as Ye, toDisplayString as me, unref as $, createTextVNode as zt } from "vue";
 import { useQueryClient as Ft, useQuery as Ht } from "@tanstack/vue-query";
-const At = Symbol.for("y2kfund.supabase");
-function Pt() {
-  const l = Lt(At, null);
+const Pt = Symbol.for("y2kfund.supabase");
+function Ot() {
+  const l = Lt(Pt, null);
   if (!l) throw new Error("[@y2kfund/core] Supabase client not found. Did you install createCore()?");
   return l;
 }
-async function Ot(l, e) {
+async function At(l, e) {
   if (!e)
     return console.log("⚠️ No userId provided, showing all positions"), [];
   try {
@@ -27,7 +27,7 @@ async function Ot(l, e) {
 }
 async function _t(l, e, t) {
   var i;
-  const s = await Ot(l, t);
+  const s = await At(l, t);
   console.log("🔍 Querying call positions with:", {
     symbolRoot: e,
     userId: t || "none",
@@ -68,7 +68,7 @@ async function _t(l, e, t) {
   return console.log("✅ Enriched call positions with accounts", g.length), g;
 }
 function Bt(l, e) {
-  const t = Pt(), i = Ft(), s = ["callPositions", l, e], n = Ht({
+  const t = Ot(), i = Ft(), s = ["callPositions", l, e], n = Ht({
     queryKey: s,
     queryFn: async () => l ? await _t(t, l, e) : [],
     enabled: !!l,
@@ -382,7 +382,7 @@ class w extends M {
     return this.table.alertManager.clear();
   }
 }
-var Nt = {
+var It = {
   rownum: function(l, e, t, i, s, n) {
     return n.getPosition();
   }
@@ -427,9 +427,9 @@ const q = class q extends w {
   }
 };
 v(q, "moduleName", "accessor"), //load defaults
-v(q, "accessors", Nt);
+v(q, "accessors", It);
 let we = q;
-var It = {
+var Nt = {
   method: "GET"
 };
 function Ce(l, e) {
@@ -549,7 +549,7 @@ const H = class H extends w {
   }
 };
 v(H, "moduleName", "ajax"), //load defaults
-v(H, "defaultConfig", It), v(H, "defaultURLGenerator", st), v(H, "defaultLoaderPromise", Gt), v(H, "contentTypeFormatters", jt);
+v(H, "defaultConfig", Nt), v(H, "defaultURLGenerator", st), v(H, "defaultLoaderPromise", Gt), v(H, "contentTypeFormatters", jt);
 let Ee = H;
 var Ut = {
   replace: function(l) {
@@ -561,7 +561,7 @@ var Ut = {
   insert: function(l) {
     return this.table.addData(l);
   }
-}, $t = {
+}, Xt = {
   table: function(l) {
     var e = [], t = !0, i = this.table.columnManager.columns, s = [], n = [];
     return l = l.split(`
@@ -584,19 +584,19 @@ var Ut = {
       }), n.push(o);
     }), n) : !1;
   }
-}, Xt = {
-  copyToClipboard: ["ctrl + 67", "meta + 67"]
 }, Jt = {
+  copyToClipboard: ["ctrl + 67", "meta + 67"]
+}, $t = {
   copyToClipboard: function(l) {
     this.table.modules.edit.currentCell || this.table.modExists("clipboard", !0) && this.table.modules.clipboard.copy(!1, !0);
   }
 }, Kt = {
   keybindings: {
-    bindings: Xt,
-    actions: Jt
+    bindings: Jt,
+    actions: $t
   }
 };
-const O = class O extends w {
+const A = class A extends w {
   constructor(e) {
     super(e), this.mode = !0, this.pasteParser = function() {
     }, this.pasteAction = function() {
@@ -646,7 +646,7 @@ const O = class O extends w {
   setPasteAction(e) {
     switch (typeof e) {
       case "string":
-        this.pasteAction = O.pasteActions[e], this.pasteAction || console.warn("Clipboard Error - No such paste action found:", e);
+        this.pasteAction = A.pasteActions[e], this.pasteAction || console.warn("Clipboard Error - No such paste action found:", e);
         break;
       case "function":
         this.pasteAction = e;
@@ -656,7 +656,7 @@ const O = class O extends w {
   setPasteParser(e) {
     switch (typeof e) {
       case "string":
-        this.pasteParser = O.pasteParsers[e], this.pasteParser || console.warn("Clipboard Error - No such paste parser found:", e);
+        this.pasteParser = A.pasteParsers[e], this.pasteParser || console.warn("Clipboard Error - No such paste parser found:", e);
         break;
       case "function":
         this.pasteParser = e;
@@ -682,9 +682,9 @@ const O = class O extends w {
     return window.clipboardData && window.clipboardData.getData ? t = window.clipboardData.getData("Text") : e.clipboardData && e.clipboardData.getData ? t = e.clipboardData.getData("text/plain") : e.originalEvent && e.originalEvent.clipboardData.getData && (t = e.originalEvent.clipboardData.getData("text/plain")), t;
   }
 };
-v(O, "moduleName", "clipboard"), v(O, "moduleExtensions", Kt), //load defaults
-v(O, "pasteActions", Ut), v(O, "pasteParsers", $t);
-let Re = O;
+v(A, "moduleName", "clipboard"), v(A, "moduleExtensions", Kt), //load defaults
+v(A, "pasteActions", Ut), v(A, "pasteParsers", Xt);
+let Re = A;
 class qt {
   constructor(e) {
     return this._row = e, new Proxy(this, {
@@ -3671,7 +3671,7 @@ var yi = {
     return Array.isArray(l) ? l.length ? l.indexOf(e) > -1 : !0 : (console.warn("Filter Error - filter value is not an array:", l), !1);
   }
 };
-const A = class A extends w {
+const P = class P extends w {
   constructor(e) {
     super(e), this.filterList = [], this.headerFilters = {}, this.headerFilterColumns = [], this.prevHeaderFilterChangeCheck = "", this.prevHeaderFilterChangeCheck = "{}", this.changed = !1, this.tableInitialized = !1, this.registerTableOption("filterMode", "local"), this.registerTableOption("initialFilter", !1), this.registerTableOption("initialHeaderFilter", !1), this.registerTableOption("headerFilterLiveFilterDelay", 300), this.registerTableOption("placeholderHeaderFilter", !1), this.registerColumnOption("headerFilter"), this.registerColumnOption("headerFilterPlaceholder"), this.registerColumnOption("headerFilterParams"), this.registerColumnOption("headerFilterEmptyCheck"), this.registerColumnOption("headerFilterFunc"), this.registerColumnOption("headerFilterFuncParams"), this.registerColumnOption("headerFilterLiveFilter"), this.registerTableFunction("searchRows", this.searchRows.bind(this)), this.registerTableFunction("searchData", this.searchData.bind(this)), this.registerTableFunction("setFilter", this.userSetFilter.bind(this)), this.registerTableFunction("refreshFilter", this.userRefreshFilter.bind(this)), this.registerTableFunction("addFilter", this.userAddFilter.bind(this)), this.registerTableFunction("getFilters", this.getFilters.bind(this)), this.registerTableFunction("setHeaderFilterFocus", this.userSetHeaderFilterFocus.bind(this)), this.registerTableFunction("getHeaderFilterValue", this.userGetHeaderFilterValue.bind(this)), this.registerTableFunction("setHeaderFilterValue", this.userSetHeaderFilterValue.bind(this)), this.registerTableFunction("getHeaderFilters", this.getHeaderFilters.bind(this)), this.registerTableFunction("removeFilter", this.userRemoveFilter.bind(this)), this.registerTableFunction("clearFilter", this.userClearFilter.bind(this)), this.registerTableFunction("clearHeaderFilter", this.userClearHeaderFilter.bind(this)), this.registerComponentFunction("column", "headerFilterFocus", this.setHeaderFilterFocus.bind(this)), this.registerComponentFunction("column", "reloadHeaderFilter", this.reloadHeaderFilter.bind(this)), this.registerComponentFunction("column", "getHeaderFilterValue", this.getHeaderFilterValue.bind(this)), this.registerComponentFunction("column", "setHeaderFilterValue", this.setHeaderFilterValue.bind(this));
   }
@@ -3767,9 +3767,9 @@ const A = class A extends w {
         else {
           switch (e.modules.filter.value = r, typeof e.definition.headerFilterFunc) {
             case "string":
-              A.filters[e.definition.headerFilterFunc] ? (a = e.definition.headerFilterFunc, d = function(u) {
+              P.filters[e.definition.headerFilterFunc] ? (a = e.definition.headerFilterFunc, d = function(u) {
                 var c = e.definition.headerFilterFuncParams || {}, f = e.getFieldValue(u);
-                return c = typeof c == "function" ? c(r, f, u) : c, A.filters[e.definition.headerFilterFunc](r, f, u, c);
+                return c = typeof c == "function" ? c(r, f, u) : c, P.filters[e.definition.headerFilterFunc](r, f, u, c);
               }) : console.warn("Header Filter Error - Matching filter function not found: ", e.definition.headerFilterFunc);
               break;
             case "function":
@@ -3940,10 +3940,10 @@ const A = class A extends w {
     var i = !1;
     return typeof e.field == "function" ? i = function(s) {
       return e.field(s, e.type || {});
-    } : A.filters[e.type] ? (t = this.table.columnManager.getColumnByField(e.field), t ? i = function(s) {
-      return A.filters[e.type](e.value, t.getFieldValue(s), s, e.params || {});
+    } : P.filters[e.type] ? (t = this.table.columnManager.getColumnByField(e.field), t ? i = function(s) {
+      return P.filters[e.type](e.value, t.getFieldValue(s), s, e.params || {});
     } : i = function(s) {
-      return A.filters[e.type](e.value, s[e.field], s, e.params || {});
+      return P.filters[e.type](e.value, s[e.field], s, e.params || {});
     }) : console.warn("Filter Error - No such filter type found, ignoring: ", e.type), e.func = i, e.func ? e : !1;
   }
   findSubFilters(e) {
@@ -4029,9 +4029,9 @@ const A = class A extends w {
     }) : i = e.func(t), i;
   }
 };
-v(A, "moduleName", "filter"), //load defaults
-v(A, "filters", yi);
-let Le = A;
+v(P, "moduleName", "filter"), //load defaults
+v(P, "filters", yi);
+let Le = P;
 function Ei(l, e, t) {
   return this.emptyToSpace(this.sanitizeHTML(l.getValue()));
 }
@@ -4154,7 +4154,7 @@ function Hi(l, e, t) {
     return s.style.backgroundColor = a, s;
   }
 }
-function Ai(l, e = {}, t) {
+function Pi(l, e = {}, t) {
   var i = this.sanitizeHTML(l.getValue()) || 0, s = l.getElement(), n = e.max ? e.max : 100, r = e.min ? e.min : 0, o = e.legendAlign ? e.legendAlign : "center", a, h, d, u, c;
   switch (h = parseFloat(i) <= n ? parseFloat(i) : n, h = parseFloat(h) >= r ? parseFloat(h) : r, a = (n - r) / 100, h = Math.round((h - r) / a), typeof e.color) {
     case "string":
@@ -4217,10 +4217,10 @@ function Ai(l, e = {}, t) {
     s.appendChild(p), p.appendChild(f), u && p.appendChild(g);
   }), "";
 }
-function Pi(l, e, t) {
+function Oi(l, e, t) {
   return l.getElement().style.backgroundColor = this.sanitizeHTML(l.getValue()), "";
 }
-function Oi(l, e, t) {
+function Ai(l, e, t) {
   return '<svg enable-background="new 0 0 24 24" height="14" width="14" viewBox="0 0 24 24" xml:space="preserve" ><path fill="#2DC214" clip-rule="evenodd" d="M21.652,3.211c-0.293-0.295-0.77-0.295-1.061,0L9.41,14.34  c-0.293,0.297-0.771,0.297-1.062,0L3.449,9.351C3.304,9.203,3.114,9.13,2.923,9.129C2.73,9.128,2.534,9.201,2.387,9.351  l-2.165,1.946C0.078,11.445,0,11.63,0,11.823c0,0.194,0.078,0.397,0.223,0.544l4.94,5.184c0.292,0.296,0.771,0.776,1.062,1.07  l2.124,2.141c0.292,0.293,0.769,0.293,1.062,0l14.366-14.34c0.293-0.294,0.293-0.777,0-1.071L21.652,3.211z" fill-rule="evenodd"/></svg>';
 }
 function _i(l, e, t) {
@@ -4238,10 +4238,10 @@ function Vi(l, e, t) {
     e.relativeToPage && (r += n.modules.page.getPageSize() * (n.modules.page.getPage() - 1)), i.innerText = r;
   }), i;
 }
-function Ni(l, e, t) {
+function Ii(l, e, t) {
   return l.getElement().classList.add("tabulator-row-handle"), "<div class='tabulator-row-handle-box'><div class='tabulator-row-handle-bar'></div><div class='tabulator-row-handle-bar'></div><div class='tabulator-row-handle-bar'></div></div>";
 }
-function Ii(l, e, t) {
+function Ni(l, e, t) {
   var i, s, n;
   function r(o) {
     var a = o.getValue(), h = "plaintext";
@@ -4281,14 +4281,14 @@ var ji = {
   lookup: zi,
   star: Fi,
   traffic: Hi,
-  progress: Ai,
-  color: Pi,
-  buttonTick: Oi,
+  progress: Pi,
+  color: Oi,
+  buttonTick: Ai,
   buttonCross: _i,
   toggle: Bi,
   rownum: Vi,
-  handle: Ni,
-  adaptable: Ii,
+  handle: Ii,
+  adaptable: Ni,
   array: Wi,
   json: Gi
 };
@@ -5032,7 +5032,7 @@ class dt extends w {
   }
 }
 v(dt, "moduleName", "groupRows");
-var $i = {
+var Xi = {
   cellEdit: function(l) {
     l.component.setValueProcessData(l.data.oldValue), l.component.cellRendered();
   },
@@ -5047,7 +5047,7 @@ var $i = {
     var e = l.data.posFrom - l.data.posTo > 0;
     this.table.rowManager.moveRowActual(l.component, this.table.rowManager.getRowFromPosition(l.data.posFrom), e), this.table.rowManager.regenerateRowPositions(), this.table.rowManager.reRenderInPosition();
   }
-}, Xi = {
+}, Ji = {
   cellEdit: function(l) {
     l.component.setValueProcessData(l.data.newValue), l.component.cellRendered();
   },
@@ -5061,7 +5061,7 @@ var $i = {
   rowMove: function(l) {
     this.table.rowManager.moveRowActual(l.component, this.table.rowManager.getRowFromPosition(l.data.posTo), l.data.after), this.table.rowManager.regenerateRowPositions(), this.table.rowManager.reRenderInPosition();
   }
-}, Ji = {
+}, $i = {
   undo: ["ctrl + 90", "meta + 90"],
   redo: ["ctrl + 89", "meta + 89"]
 }, Ki = {
@@ -5075,11 +5075,11 @@ var $i = {
   }
 }, qi = {
   keybindings: {
-    bindings: Ji,
+    bindings: $i,
     actions: Ki
   }
 };
-const N = class N extends w {
+const I = class I extends w {
   constructor(e) {
     super(e), this.history = [], this.index = -1, this.registerTableOption("history", !1);
   }
@@ -5124,7 +5124,7 @@ const N = class N extends w {
   undo() {
     if (this.index > -1) {
       let e = this.history[this.index];
-      return N.undoers[e.type].call(this, e), this.index--, this.dispatchExternal("historyUndo", e.type, e.component.getComponent(), e.data), !0;
+      return I.undoers[e.type].call(this, e), this.index--, this.dispatchExternal("historyUndo", e.type, e.component.getComponent(), e.data), !0;
     } else
       return console.warn(this.options("history") ? "History Undo Error - No more history to undo" : "History module not enabled"), !1;
   }
@@ -5132,7 +5132,7 @@ const N = class N extends w {
     if (this.history.length - 1 > this.index) {
       this.index++;
       let e = this.history[this.index];
-      return N.redoers[e.type].call(this, e), this.dispatchExternal("historyRedo", e.type, e.component.getComponent(), e.data), !0;
+      return I.redoers[e.type].call(this, e), this.dispatchExternal("historyRedo", e.type, e.component.getComponent(), e.data), !0;
     } else
       return console.warn(this.options("history") ? "History Redo Error - No more history to redo" : "History module not enabled"), !1;
   }
@@ -5148,9 +5148,9 @@ const N = class N extends w {
     });
   }
 };
-v(N, "moduleName", "history"), v(N, "moduleExtensions", qi), //load defaults
-v(N, "undoers", $i), v(N, "redoers", Xi);
-let De = N;
+v(I, "moduleName", "history"), v(I, "moduleExtensions", qi), //load defaults
+v(I, "undoers", Xi), v(I, "redoers", Ji);
+let De = I;
 class ut extends w {
   constructor(e) {
     super(e), this.fieldIndex = [], this.hasIndex = !1;
@@ -5589,17 +5589,17 @@ var is = {
     this.dispatch("keybinding-nav-down", l);
   }
 };
-const I = class I extends w {
+const N = class N extends w {
   constructor(e) {
     super(e), this.watchKeys = null, this.pressedKeys = null, this.keyupBinding = !1, this.keydownBinding = !1, this.registerTableOption("keybindings", {}), this.registerTableOption("tabEndNewRow", !1);
   }
   initialize() {
     var e = this.table.options.keybindings, t = {};
-    this.watchKeys = {}, this.pressedKeys = [], e !== !1 && (Object.assign(t, I.bindings), Object.assign(t, e), this.mapBindings(t), this.bindEvents()), this.subscribe("table-destroy", this.clearBindings.bind(this));
+    this.watchKeys = {}, this.pressedKeys = [], e !== !1 && (Object.assign(t, N.bindings), Object.assign(t, e), this.mapBindings(t), this.bindEvents()), this.subscribe("table-destroy", this.clearBindings.bind(this));
   }
   mapBindings(e) {
     for (let t in e)
-      I.actions[t] ? e[t] && (typeof e[t] != "object" && (e[t] = [e[t]]), e[t].forEach((i) => {
+      N.actions[t] ? e[t] && (typeof e[t] != "object" && (e[t] = [e[t]]), e[t].forEach((i) => {
         var s = Array.isArray(i) ? i : [i];
         s.forEach((n) => {
           this.mapBinding(t, n);
@@ -5608,7 +5608,7 @@ const I = class I extends w {
   }
   mapBinding(e, t) {
     var i = {
-      action: I.actions[e],
+      action: N.actions[e],
       keys: [],
       ctrl: !1,
       shift: !1,
@@ -5656,9 +5656,9 @@ const I = class I extends w {
     }), i && t.action.call(this, e), !0) : !1;
   }
 };
-v(I, "moduleName", "keybindings"), //load defaults
-v(I, "bindings", is), v(I, "actions", ss);
-let Fe = I;
+v(N, "moduleName", "keybindings"), //load defaults
+v(N, "bindings", is), v(N, "actions", ss);
+let Fe = N;
 class ft extends w {
   constructor(e) {
     super(e), this.menuContainer = null, this.nestedMenuBlock = !1, this.currentComponent = null, this.rootPopup = null, this.columnSubscribers = {}, this.registerTableOption("rowContextMenu", !1), this.registerTableOption("rowClickMenu", !1), this.registerTableOption("rowDblClickMenu", !1), this.registerTableOption("groupContextMenu", !1), this.registerTableOption("groupClickMenu", !1), this.registerTableOption("groupDblClickMenu", !1), this.registerColumnOption("headerContextMenu"), this.registerColumnOption("headerClickMenu"), this.registerColumnOption("headerDblClickMenu"), this.registerColumnOption("headerMenu"), this.registerColumnOption("headerMenuIcon"), this.registerColumnOption("contextMenu"), this.registerColumnOption("clickMenu"), this.registerColumnOption("dblClickMenu");
@@ -6065,7 +6065,7 @@ const Q = class Q extends w {
 };
 v(Q, "moduleName", "mutator"), //load defaults
 v(Q, "mutators", os);
-let Ae = Q;
+let Pe = Q;
 function as(l, e, t, i, s) {
   var n = document.createElement("span"), r = document.createElement("span"), o = document.createElement("span"), a = document.createElement("span"), h = document.createElement("span"), d = document.createElement("span");
   return this.table.modules.localize.langBind("pagination|counter|showing", (u) => {
@@ -6359,7 +6359,7 @@ const re = class re extends w {
 };
 v(re, "moduleName", "page"), //load defaults
 v(re, "pageCounters", hs);
-let Pe = re;
+let Oe = re;
 var ds = {
   local: function(l, e) {
     var t = localStorage.getItem(l + "-" + e);
@@ -6537,7 +6537,7 @@ const D = class D extends w {
 };
 v(D, "moduleName", "persistence"), v(D, "moduleInitOrder", -10), //load defaults
 v(D, "readers", ds), v(D, "writers", us);
-let Oe = D;
+let Ae = D;
 class mt extends w {
   constructor(e) {
     super(e), this.columnSubscribers = {}, this.registerTableOption("rowContextPopup", !1), this.registerTableOption("rowClickPopup", !1), this.registerTableOption("rowDblClickPopup", !1), this.registerTableOption("groupContextPopup", !1), this.registerTableOption("groupClickPopup", !1), this.registerTableOption("groupDblClickPopup", !1), this.registerColumnOption("headerContextPopup"), this.registerColumnOption("headerClickPopup"), this.registerColumnOption("headerDblClickPopup"), this.registerColumnOption("headerPopup"), this.registerColumnOption("headerPopupIcon"), this.registerColumnOption("contextPopup"), this.registerColumnOption("clickPopup"), this.registerColumnOption("dblClickPopup"), this.registerComponentFunction("cell", "popup", this._componentPopupCall.bind(this)), this.registerComponentFunction("column", "popup", this._componentPopupCall.bind(this)), this.registerComponentFunction("row", "popup", this._componentPopupCall.bind(this)), this.registerComponentFunction("group", "popup", this._componentPopupCall.bind(this));
@@ -7945,7 +7945,7 @@ function ks(l, e, t, i, s, n, r) {
   }
   return (o === "top" && n === "desc" || o === "bottom" && n === "asc") && (a *= -1), a;
 }
-function $e(l, e, t, i, s, n, r) {
+function Xe(l, e, t, i, s, n, r) {
   var o = this.table.dependencyRegistry.lookup(["luxon", "DateTime"], "DateTime"), a = r.format || "dd/MM/yyyy HH:mm:ss", h = r.alignEmptyValues, d = 0;
   if (typeof o < "u") {
     if (o.isDateTime(l) || (a === "iso" ? l = o.fromISO(String(l)) : l = o.fromFormat(String(l), a)), o.isDateTime(e) || (a === "iso" ? e = o.fromISO(String(e)) : e = o.fromFormat(String(e), a)), !l.isValid)
@@ -7959,10 +7959,10 @@ function $e(l, e, t, i, s, n, r) {
     console.error("Sort Error - 'datetime' sorter is dependant on luxon.js");
 }
 function Ms(l, e, t, i, s, n, r) {
-  return r.format || (r.format = "dd/MM/yyyy"), $e.call(this, l, e, t, i, s, n, r);
+  return r.format || (r.format = "dd/MM/yyyy"), Xe.call(this, l, e, t, i, s, n, r);
 }
 function Ls(l, e, t, i, s, n, r) {
-  return r.format || (r.format = "HH:mm"), $e.call(this, l, e, t, i, s, n, r);
+  return r.format || (r.format = "HH:mm"), Xe.call(this, l, e, t, i, s, n, r);
 }
 function Ss(l, e, t, i, s, n, r) {
   var o = l === !0 || l === "true" || l === "True" || l === 1 ? 1 : 0, a = e === !0 || e === "true" || e === "True" || e === 1 ? 1 : 0;
@@ -8035,7 +8035,7 @@ var Hs = {
   string: ks,
   date: Ms,
   time: Ls,
-  datetime: $e,
+  datetime: Xe,
   boolean: Ss,
   array: Ds,
   exists: zs,
@@ -8224,7 +8224,7 @@ const j = class j extends w {
 v(j, "moduleName", "sort"), //load defaults
 v(j, "sorters", Hs);
 let Ve = j;
-class As {
+class Ps {
   constructor(e, t) {
     this.columnCount = e, this.rowCount = t, this.columnString = [], this.columns = [], this.rows = [];
   }
@@ -8297,7 +8297,7 @@ class yt {
 }
 class Ze extends M {
   constructor(e, t) {
-    super(e.table), this.spreadsheetManager = e, this.definition = t, this.title = this.definition.title || "", this.key = this.definition.key || this.definition.title, this.rowCount = this.definition.rows, this.columnCount = this.definition.columns, this.data = this.definition.data || [], this.element = null, this.isActive = !1, this.grid = new As(this.columnCount, this.rowCount), this.defaultColumnDefinition = { width: 100, headerHozAlign: "center", headerSort: !1 }, this.columnDefinition = Object.assign(this.defaultColumnDefinition, this.options("spreadsheetColumnDefinition")), this.columnDefs = [], this.rowDefs = [], this.columnFields = [], this.columns = [], this.rows = [], this.scrollTop = null, this.scrollLeft = null, this.initialize(), this.dispatchExternal("sheetAdded", this.getComponent());
+    super(e.table), this.spreadsheetManager = e, this.definition = t, this.title = this.definition.title || "", this.key = this.definition.key || this.definition.title, this.rowCount = this.definition.rows, this.columnCount = this.definition.columns, this.data = this.definition.data || [], this.element = null, this.isActive = !1, this.grid = new Ps(this.columnCount, this.rowCount), this.defaultColumnDefinition = { width: 100, headerHozAlign: "center", headerSort: !1 }, this.columnDefinition = Object.assign(this.defaultColumnDefinition, this.options("spreadsheetColumnDefinition")), this.columnDefs = [], this.rowDefs = [], this.columnFields = [], this.columns = [], this.rows = [], this.scrollTop = null, this.scrollLeft = null, this.initialize(), this.dispatchExternal("sheetAdded", this.getComponent());
   }
   ///////////////////////////////////
   ///////// Initialization //////////
@@ -8525,7 +8525,7 @@ class Rt extends w {
   }
 }
 v(Rt, "moduleName", "tooltip");
-var Ps = {
+var Os = {
   //is integer
   integer: function(l, e, t) {
     return e === "" || e === null || typeof e > "u" ? !0 : (e = Number(e), !isNaN(e) && isFinite(e) && Math.floor(e) === e);
@@ -8717,8 +8717,8 @@ const oe = class oe extends w {
   }
 };
 v(oe, "moduleName", "validate"), //load defaults
-v(oe, "validators", Ps);
-let Ne = oe;
+v(oe, "validators", Os);
+let Ie = oe;
 var be = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   AccessorModule: we,
@@ -8742,9 +8742,9 @@ var be = /* @__PURE__ */ Object.freeze({
   MenuModule: ft,
   MoveColumnsModule: pt,
   MoveRowsModule: He,
-  MutatorModule: Ae,
-  PageModule: Pe,
-  PersistenceModule: Oe,
+  MutatorModule: Pe,
+  PageModule: Oe,
+  PersistenceModule: Ae,
   PopupModule: mt,
   PrintModule: gt,
   ReactiveDataModule: bt,
@@ -8757,8 +8757,8 @@ var be = /* @__PURE__ */ Object.freeze({
   SortModule: Ve,
   SpreadsheetModule: Et,
   TooltipModule: Rt,
-  ValidateModule: Ne
-}), Os = {
+  ValidateModule: Ie
+}), As = {
   debugEventsExternal: !1,
   //flag to console log events
   debugEventsInternal: !1,
@@ -9466,7 +9466,7 @@ class Vs extends M {
     R.elVisible(this.element) && this.verticalAlignHeaders(), e && (this.table.rowManager.resetScroll(), this.table.rowManager.reinitialize()), this.confirm("table-redrawing", e) || this.layoutRefresh(e), this.dispatch("table-redraw", e), this.table.footerManager.redraw();
   }
 }
-class Ns extends fe {
+class Is extends fe {
   constructor(e) {
     super(e), this.verticalFillMode = "fill", this.scrollTop = 0, this.scrollLeft = 0, this.scrollTop = 0, this.scrollLeft = 0;
   }
@@ -9499,7 +9499,7 @@ class Ns extends fe {
     return this.rows();
   }
 }
-class Is extends fe {
+class Ns extends fe {
   constructor(e) {
     super(e), this.verticalFillMode = "fill", this.scrollTop = 0, this.scrollLeft = 0, this.vDomRowHeight = 20, this.vDomTop = 0, this.vDomBottom = 0, this.vDomScrollPosTop = 0, this.vDomScrollPosBottom = 0, this.vDomTopPad = 0, this.vDomBottomPad = 0, this.vDomMaxRenderChain = 90, this.vDomWindowBuffer = 0, this.vDomWindowMinTotalRows = 20, this.vDomWindowMinMarginRows = 5, this.vDomTopNewRows = [], this.vDomBottomNewRows = [];
   }
@@ -9573,7 +9573,7 @@ class Is extends fe {
   //////////////////////////////////////
   //full virtual render
   _virtualRenderFill(e, t, i) {
-    var s = this.tableElement, n = this.elementVertical, r = 0, o = 0, a = 0, h = 0, d = 0, u = 0, c = this.rows(), f = c.length, p = 0, g, b, m = [], C = 0, T = 0, k = this.table.rowManager.fixedHeight, x = this.elementVertical.clientHeight, z = this.table.options.rowHeight, $ = !0;
+    var s = this.tableElement, n = this.elementVertical, r = 0, o = 0, a = 0, h = 0, d = 0, u = 0, c = this.rows(), f = c.length, p = 0, g, b, m = [], C = 0, T = 0, k = this.table.rowManager.fixedHeight, x = this.elementVertical.clientHeight, z = this.table.options.rowHeight, X = !0;
     if (e = e || 0, i = i || 0, !e)
       this.clear();
     else {
@@ -9592,7 +9592,7 @@ class Is extends fe {
           S.heightInitialized || S.setCellHeight();
         }), m.forEach((S) => {
           a = S.getHeight(), C < r ? d += a : o += a, a > this.vDomWindowBuffer && (this.vDomWindowBuffer = a * 2), C++;
-        }), $ = this.table.rowManager.adjustTableSize(), x = this.elementVertical.clientHeight, $ && (k || this.table.options.maxHeight) && (z = o / C, T = Math.max(this.vDomWindowMinTotalRows, Math.ceil(x / z + this.vDomWindowBuffer / z)));
+        }), X = this.table.rowManager.adjustTableSize(), x = this.elementVertical.clientHeight, X && (k || this.table.options.maxHeight) && (z = o / C, T = Math.max(this.vDomWindowMinTotalRows, Math.ceil(x / z + this.vDomWindowBuffer / z)));
       }
       e ? (this.vDomTopPad = t ? this.vDomRowHeight * this.vDomTop + i : this.scrollTop - d, this.vDomBottomPad = this.vDomBottom == f - 1 ? 0 : Math.max(this.vDomScrollHeight - this.vDomTopPad - o - d, 0)) : (this.vDomTopPad = 0, this.vDomRowHeight = Math.floor((o + d) / C), this.vDomBottomPad = this.vDomRowHeight * (f - this.vDomBottom - 1), this.vDomScrollHeight = d + o + this.vDomBottomPad - x), s.style.paddingTop = this.vDomTopPad + "px", s.style.paddingBottom = this.vDomBottomPad + "px", t && (this.scrollTop = this.vDomTopPad + d + i - (this.elementVertical.scrollWidth > this.elementVertical.clientWidth ? this.elementVertical.offsetHeight - x : 0)), this.scrollTop = Math.min(this.scrollTop, this.elementVertical.scrollHeight - x), this.elementVertical.scrollWidth > this.elementVertical.clientWidth && t && (this.scrollTop += this.elementVertical.offsetHeight - x), this.vDomScrollPosTop = this.scrollTop, this.vDomScrollPosBottom = this.scrollTop, n.scrollTop = this.scrollTop, this.dispatch("render-virtual-fill");
     }
@@ -9941,8 +9941,8 @@ Data:     `, e);
   }
   initializeRenderer() {
     var e, t = {
-      virtual: Is,
-      basic: Ns
+      virtual: Ns,
+      basic: Is
     };
     typeof this.table.options.renderVertical == "string" ? e = t[this.table.options.renderVertical] : e = this.table.options.renderVertical, e ? (this.renderMode = this.table.options.renderVertical, this.renderer = new e(this.table, this.element, this.tableElement), this.renderer.initialize(), (this.table.element.clientHeight || this.table.options.height) && !(this.table.options.minHeight && this.table.options.maxHeight) ? this.fixedHeight = !0 : this.fixedHeight = !1) : console.error("Unable to find matching renderer:", this.table.options.renderVertical);
   }
@@ -10235,7 +10235,7 @@ class Us {
     i !== "then" && typeof i == "string" && !i.startsWith("_") && this.table.options.debugInvalidComponentFuncs && console.error("The " + e + " component does not have a " + i + " function, have you checked that you have the correct Tabulator module installed?");
   }
 }
-class $s extends M {
+class Xs extends M {
   constructor(e) {
     super(e), this.requestOrder = 0, this.loading = !1;
   }
@@ -10292,7 +10292,7 @@ class $s extends M {
     this.table.alertManager.clear();
   }
 }
-class Xs {
+class Js {
   constructor(e, t, i) {
     this.table = e, this.events = {}, this.optionsList = t || {}, this.subscriptionNotifiers = {}, this.dispatch = i ? this._debugDispatch.bind(this) : this._dispatch.bind(this), this.debug = i;
   }
@@ -10341,7 +10341,7 @@ class Xs {
     return e[0] = "ExternalEvent:" + e[0], (this.debug === !0 || this.debug.includes(t)) && console.log(...e), this._dispatch(...arguments);
   }
 }
-class Js {
+class $s {
   constructor(e) {
     this.events = {}, this.subscriptionNotifiers = {}, this.dispatch = e ? this._debugDispatch.bind(this) : this._dispatch.bind(this), this.chain = e ? this._debugChain.bind(this) : this._chain.bind(this), this.confirm = e ? this._debugConfirm.bind(this) : this._confirm.bind(this), this.debug = e;
   }
@@ -10481,21 +10481,21 @@ function Zs(l, e) {
     return typeof p == "string" ? p.indexOf("%") > -1 ? g = t / 100 * parseInt(p) : g = parseInt(p) : g = p, g;
   }
   function f(p, g, b, m) {
-    var C = [], T = 0, k = 0, x = 0, z = n, $ = 0, S = 0, pe = [];
-    function Xe(y) {
+    var C = [], T = 0, k = 0, x = 0, z = n, X = 0, S = 0, pe = [];
+    function Je(y) {
       return b * (y.column.definition.widthGrow || 1);
     }
-    function Je(y) {
+    function $e(y) {
       return c(y.width) - b * (y.column.definition.widthShrink || 0);
     }
     return p.forEach(function(y, gn) {
-      var Ke = m ? Je(y) : Xe(y);
+      var Ke = m ? $e(y) : Je(y);
       y.column.minWidth >= Ke ? C.push(y) : y.column.maxWidth && y.column.maxWidth < Ke ? (y.width = y.column.maxWidth, g -= y.column.maxWidth, z -= m ? y.column.definition.widthShrink || 1 : y.column.definition.widthGrow || 1, z && (b = Math.floor(g / z))) : (pe.push(y), S += m ? y.column.definition.widthShrink || 1 : y.column.definition.widthGrow || 1);
     }), C.length ? (C.forEach(function(y) {
       T += m ? y.width - y.column.minWidth : y.column.minWidth, y.width = y.column.minWidth;
-    }), k = g - T, x = S ? Math.floor(k / S) : k, $ = f(pe, k, x, m)) : ($ = S ? g - Math.floor(g / S) * S : g, pe.forEach(function(y) {
-      y.width = m ? Je(y) : Xe(y);
-    })), $;
+    }), k = g - T, x = S ? Math.floor(k / S) : k, X = f(pe, k, x, m)) : (X = S ? g - Math.floor(g / S) * S : g, pe.forEach(function(y) {
+      y.width = m ? $e(y) : Je(y);
+    })), X;
   }
   this.table.options.responsiveLayout && this.table.modExists("responsiveLayout", !0) && this.table.modules.responsiveLayout.update(), this.table.rowManager.element.scrollHeight > this.table.rowManager.element.clientHeight && (t -= this.table.rowManager.element.offsetWidth - this.table.rowManager.element.clientWidth), l.forEach(function(p) {
     var g, b, m;
@@ -10544,7 +10544,7 @@ const Z = class Z extends w {
 };
 v(Z, "moduleName", "layout"), //load defaults
 v(Z, "modes", en);
-let Ie = Z;
+let Ne = Z;
 var tn = {
   default: {
     //hold default locale text
@@ -10682,7 +10682,7 @@ v(Tt, "moduleName", "comms");
 var sn = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   CommsModule: Tt,
-  LayoutModule: Ie,
+  LayoutModule: Ne,
   LocalizeModule: We
 });
 const F = class F {
@@ -10813,15 +10813,15 @@ class nn extends M {
     this.dispatch("alert-hide", this.type), this.element.parentNode && this.element.parentNode.removeChild(this.element), this.msgElement.classList.remove(this._typeClass());
   }
 }
-const P = class P extends je {
+const O = class O extends je {
   static extendModule() {
-    P.initializeModuleBinder(), P._extendModule(...arguments);
+    O.initializeModuleBinder(), O._extendModule(...arguments);
   }
   static registerModule() {
-    P.initializeModuleBinder(), P._registerModule(...arguments);
+    O.initializeModuleBinder(), O._registerModule(...arguments);
   }
   constructor(e, t, i) {
-    super(), P.initializeModuleBinder(i), this.options = {}, this.columnManager = null, this.rowManager = null, this.footerManager = null, this.alertManager = null, this.vdomHoz = null, this.externalEvents = null, this.eventBus = null, this.interactionMonitor = !1, this.browser = "", this.browserSlow = !1, this.browserMobile = !1, this.rtl = !1, this.originalElement = null, this.componentFunctionBinder = new Us(this), this.dataLoader = !1, this.modules = {}, this.modulesCore = [], this.modulesRegular = [], this.deprecationAdvisor = new Ks(this), this.optionsList = new xt(this, "table constructor"), this.dependencyRegistry = new qs(this), this.initialized = !1, this.destroyed = !1, this.initializeElement(e) && (this.initializeCoreSystems(t), setTimeout(() => {
+    super(), O.initializeModuleBinder(i), this.options = {}, this.columnManager = null, this.rowManager = null, this.footerManager = null, this.alertManager = null, this.vdomHoz = null, this.externalEvents = null, this.eventBus = null, this.interactionMonitor = !1, this.browser = "", this.browserSlow = !1, this.browserMobile = !1, this.rtl = !1, this.originalElement = null, this.componentFunctionBinder = new Us(this), this.dataLoader = !1, this.modules = {}, this.modulesCore = [], this.modulesRegular = [], this.deprecationAdvisor = new Ks(this), this.optionsList = new xt(this, "table constructor"), this.dependencyRegistry = new qs(this), this.initialized = !1, this.destroyed = !1, this.initializeElement(e) && (this.initializeCoreSystems(t), setTimeout(() => {
       this._create();
     })), this.constructor.registry.register(this);
   }
@@ -10829,7 +10829,7 @@ const P = class P extends je {
     return typeof HTMLElement < "u" && e instanceof HTMLElement ? (this.element = e, !0) : typeof e == "string" ? (this.element = document.querySelector(e), this.element ? !0 : (console.error("Tabulator Creation Error - no element found matching selector: ", e), !1)) : (console.error("Tabulator Creation Error - Invalid element provided:", e), !1);
   }
   initializeCoreSystems(e) {
-    this.columnManager = new Vs(this), this.rowManager = new Ws(this), this.footerManager = new Gs(this), this.dataLoader = new $s(this), this.alertManager = new nn(this), this._bindModules(), this.options = this.optionsList.generate(P.defaultOptions, e), this._clearObjectPointers(), this._mapDeprecatedFunctionality(), this.externalEvents = new Xs(this, this.options, this.options.debugEventsExternal), this.eventBus = new Js(this.options.debugEventsInternal), this.interactionMonitor = new js(this), this.dataLoader.initialize(), this.footerManager.initialize(), this.dependencyRegistry.initialize();
+    this.columnManager = new Vs(this), this.rowManager = new Ws(this), this.footerManager = new Gs(this), this.dataLoader = new Xs(this), this.alertManager = new nn(this), this._bindModules(), this.options = this.optionsList.generate(O.defaultOptions, e), this._clearObjectPointers(), this._mapDeprecatedFunctionality(), this.externalEvents = new Js(this, this.options, this.options.debugEventsExternal), this.eventBus = new $s(this.options.debugEventsInternal), this.interactionMonitor = new js(this), this.dataLoader.initialize(), this.footerManager.initialize(), this.dependencyRegistry.initialize();
   }
   //convert deprecated functionality to new functions
   _mapDeprecatedFunctionality() {
@@ -11121,8 +11121,8 @@ const P = class P extends je {
   }
 };
 //default setup options
-v(P, "defaultOptions", Os);
-let Ue = P;
+v(O, "defaultOptions", As);
+let Ue = O;
 var ie = Ue;
 class rn extends ie {
   static extendModule() {
@@ -11221,13 +11221,16 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       return `20${d}-${u}-${c}`;
     }
     const n = [
-      { title: "Account", field: "legal_entity", minWidth: 100, headerHozAlign: "left" },
       {
-        title: "Financial Instrument",
-        field: "symbol",
+        title: "Strike price",
+        field: "strike_price",
         minWidth: 100,
+        hozAlign: "left",
         headerHozAlign: "left",
-        formatter: (h) => i(h.getValue()).map((u) => `<span class="fi-tag">${u}</span>`).join(" ")
+        formatter: (h) => {
+          const d = h.getRow().getData();
+          return d.asset_class === "OPT" ? i(d.symbol)[2] || '<span style="color:#aaa;font-style:italic;">Unknown</span>' : '<span style="color:#aaa;font-style:italic;">Not applicable</span>';
+        }
       },
       {
         title: "Expiry Date",
@@ -11240,13 +11243,9 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
           return d.asset_class === "OPT" ? i(d.symbol)[1] || '<span style="color:#aaa;font-style:italic;">Unknown</span>' : '<span style="color:#aaa;font-style:italic;">Not applicable</span>';
         }
       },
-      { title: "Asset Class", field: "asset_class", minWidth: 100, headerHozAlign: "left" },
-      { title: "Conid", field: "conid", minWidth: 100, hozAlign: "right", headerHozAlign: "right" },
-      { title: "Underlying Conid", field: "undConid", minWidth: 100, hozAlign: "right", headerHozAlign: "right" },
-      { title: "Multiplier", field: "multiplier", minWidth: 100, hozAlign: "right", headerHozAlign: "right", formatter: "money" },
       {
-        title: "Contract Quantity",
-        field: "contract_quantity",
+        title: "Accounting Quantity",
+        field: "accounting_quantity",
         minWidth: 100,
         hozAlign: "right",
         headerHozAlign: "right",
@@ -11262,29 +11261,6 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
           decimal: ".",
           thousand: ",",
           precision: 0
-        }
-      },
-      { title: "Accounting Quantity", field: "accounting_quantity", minWidth: 100, hozAlign: "right", headerHozAlign: "right", formatter: "money" },
-      {
-        title: "Avg Price",
-        field: "avgPrice",
-        minWidth: 100,
-        hozAlign: "right",
-        headerHozAlign: "right",
-        formatter: (h) => {
-          const d = h.getValue();
-          return d != null ? "$" + Number(d).toFixed(2) : "";
-        }
-      },
-      {
-        title: "Market Price",
-        field: "price",
-        minWidth: 100,
-        hozAlign: "right",
-        headerHozAlign: "right",
-        formatter: (h) => {
-          const d = h.getValue();
-          return d != null ? "$" + Number(d).toFixed(2) : "";
         }
       },
       {
@@ -11336,37 +11312,6 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
         }
       },
       {
-        title: "If Exercised Cash Flow",
-        field: "computed_cash_flow_on_exercise",
-        minWidth: 100,
-        hozAlign: "right",
-        headerHozAlign: "right",
-        formatter: (h) => {
-          const d = h.getValue();
-          return d == null ? "" : `<span style="color:${d < 0 ? "#dc3545" : d > 0 ? "#28a745" : "#000"}">$${Number(d).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
-        },
-        bottomCalc: "sum",
-        bottomCalcFormatter: (h) => {
-          const d = h.getValue();
-          return `<span style="color:${d < 0 ? "#dc3545" : d > 0 ? "#28a745" : "#000"}">$${Number(d).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
-        }
-      },
-      {
-        title: "Entry/Exercise %",
-        field: "entry_exercise_cash_flow_pct",
-        minWidth: 100,
-        hozAlign: "right",
-        headerHozAlign: "right",
-        formatter: (h) => {
-          const d = h.getRow().getData();
-          if (d.asset_class === "OPT" && d.computed_cash_flow_on_entry != null && d.computed_cash_flow_on_exercise != null && d.computed_cash_flow_on_exercise !== 0) {
-            const u = d.computed_cash_flow_on_entry / d.computed_cash_flow_on_exercise * 100;
-            return Math.abs(u).toFixed(2) + "%";
-          }
-          return '<span style="color:#aaa;font-style:italic;">N/A</span>';
-        }
-      },
-      {
         title: "BE Price",
         field: "computed_be_price",
         minWidth: 100,
@@ -11377,28 +11322,6 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
           return d != null ? "$" + Number(d).toFixed(2) : "";
         }
       }
-      /*,
-      { 
-        title: 'Maintenance Margin Change', 
-        field: 'maintenance_margin_change', 
-        minWidth: 100, 
-        hozAlign: 'right', 
-        headerHozAlign: 'right',
-        formatter: (cell: any) => {
-          const value = cell.getValue()
-          if (value === null || value === undefined || value === '') return '-'
-          const numValue = parseFloat(value.replace(/,/g, ''))
-          const color = numValue < 0 ? '#dc3545' : numValue > 0 ? '#28a745' : '#000'
-          return `<span style="color:${color}">$${numValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
-        },
-        bottomCalc: 'sum',
-        bottomCalcFormatter: (cell: any) => {
-          const value = cell.getValue()
-          if (value === null || value === undefined || isNaN(value)) return '-'
-          const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-          return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
-        }
-      }*/
     ], { tableDiv: r, initializeTabulator: o, isTableInitialized: a } = an({
       data: t.data,
       columns: n,
@@ -11420,18 +11343,18 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
     }), (h, d) => {
       var u;
       return te(), ee("div", ln, [
-        X("div", hn, [
-          X("h2", null, "Call Positions - " + me(l.symbolRoot), 1),
-          J(t).isSuccess.value ? (te(), ee("div", dn, " Found " + me(((u = J(t).data.value) == null ? void 0 : u.length) || 0) + " position(s) ", 1)) : Ye("", !0)
+        J("div", hn, [
+          J("h2", null, "Call Positions - " + me(l.symbolRoot), 1),
+          $(t).isSuccess.value ? (te(), ee("div", dn, " Found " + me(((u = $(t).data.value) == null ? void 0 : u.length) || 0) + " position(s) ", 1)) : Ye("", !0)
         ]),
-        J(t).isLoading.value ? (te(), ee("div", un, [...d[0] || (d[0] = [
-          X("div", { class: "loading-spinner" }, null, -1),
+        $(t).isLoading.value ? (te(), ee("div", un, [...d[0] || (d[0] = [
+          J("div", { class: "loading-spinner" }, null, -1),
           zt(" Loading call positions... ", -1)
-        ])])) : J(t).isError.value ? (te(), ee("div", cn, [
-          d[1] || (d[1] = X("h3", null, "Error loading positions", -1)),
-          X("p", null, me(J(t).error.value), 1)
-        ])) : J(t).isSuccess.value ? (te(), ee("div", fn, [
-          X("div", {
+        ])])) : $(t).isError.value ? (te(), ee("div", cn, [
+          d[1] || (d[1] = J("h3", null, "Error loading positions", -1)),
+          J("p", null, me($(t).error.value), 1)
+        ])) : $(t).isSuccess.value ? (te(), ee("div", fn, [
+          J("div", {
             ref_key: "tableDiv",
             ref: r,
             class: "tabulator-table"
@@ -11445,7 +11368,7 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-275228cf"]]);
+}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-c6a43a08"]]);
 export {
   yn as callPositions,
   yn as default

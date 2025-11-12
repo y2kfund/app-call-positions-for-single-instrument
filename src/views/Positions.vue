@@ -44,16 +44,15 @@ function formatExpiryFromYyMmDd(code: string): string {
 
 // Define columns
 const columns: ColumnDefinition[] = [
-  { title: 'Account', field: 'legal_entity', minWidth: 100, headerHozAlign: 'left' },
-  { 
-    title: 'Financial Instrument', 
-    field: 'symbol', 
-    minWidth: 100,
-    headerHozAlign: 'left',
+  { title: 'Strike price', field: 'strike_price', minWidth: 100, hozAlign: 'left', headerHozAlign: 'left',
     formatter: (cell: any) => {
-      const tags = extractTagsFromSymbol(cell.getValue())
-      return tags.map(tag => `<span class="fi-tag">${tag}</span>`).join(' ')
-    },
+      const row = cell.getRow().getData()
+      if (row.asset_class === 'OPT') {
+        const tags = extractTagsFromSymbol(row.symbol)
+        return tags[2] || '<span style="color:#aaa;font-style:italic;">Unknown</span>'
+      }
+      return '<span style="color:#aaa;font-style:italic;">Not applicable</span>'
+    }
   },
   { title: 'Expiry Date', field: 'expiry_date', minWidth: 100, hozAlign: 'left', headerHozAlign: 'left',
     formatter: (cell: any) => {
@@ -65,13 +64,9 @@ const columns: ColumnDefinition[] = [
       return '<span style="color:#aaa;font-style:italic;">Not applicable</span>'
     }
   },
-  { title: 'Asset Class', field: 'asset_class', minWidth: 100, headerHozAlign: 'left' },
-  { title: 'Conid', field: 'conid', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right' },
-  { title: 'Underlying Conid', field: 'undConid', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right' },
-  { title: 'Multiplier', field: 'multiplier', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right', formatter: 'money' },
   { 
-    title: 'Contract Quantity', 
-    field: 'contract_quantity', 
+    title: 'Accounting Quantity', 
+    field: 'accounting_quantity', 
     minWidth: 100, 
     hozAlign: 'right', 
     headerHozAlign: 'right', 
@@ -87,19 +82,6 @@ const columns: ColumnDefinition[] = [
       decimal: '.',
       thousand: ',',
       precision: 0
-    }
-  },
-  { title: 'Accounting Quantity', field: 'accounting_quantity', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right', formatter: 'money' },
-  { title: 'Avg Price', field: 'avgPrice', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right', 
-    formatter: (cell: any) => {
-      const value = cell.getValue()
-      return value != null ? '$' + Number(value).toFixed(2) : ''
-    }
-  },
-  { title: 'Market Price', field: 'price', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right',
-    formatter: (cell: any) => {
-      const value = cell.getValue()
-      return value != null ? '$' + Number(value).toFixed(2) : ''
     }
   },
   { 
@@ -159,62 +141,12 @@ const columns: ColumnDefinition[] = [
       return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
     }
   },
-  { 
-    title: 'If Exercised Cash Flow', 
-    field: 'computed_cash_flow_on_exercise', 
-    minWidth: 100, 
-    hozAlign: 'right', 
-    headerHozAlign: 'right',
-    formatter: (cell: any) => {
-      const value = cell.getValue()
-      if (value == null) return ''
-      const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
-    },
-    bottomCalc: 'sum',
-    bottomCalcFormatter: (cell: any) => {
-      const value = cell.getValue()
-      const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
-    }
-  },
-  { title: 'Entry/Exercise %', field: 'entry_exercise_cash_flow_pct', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right',
-    formatter: (cell: any) => {
-      const row = cell.getRow().getData()
-      if (row.asset_class === 'OPT' && row.computed_cash_flow_on_entry != null && row.computed_cash_flow_on_exercise != null && row.computed_cash_flow_on_exercise !== 0) {
-        const pct = (row.computed_cash_flow_on_entry / row.computed_cash_flow_on_exercise) * 100
-        return Math.abs(pct).toFixed(2) + '%'
-      }
-      return '<span style="color:#aaa;font-style:italic;">N/A</span>'
-    }
-  },
   { title: 'BE Price', field: 'computed_be_price', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right',
     formatter: (cell: any) => {
       const value = cell.getValue()
       return value != null ? '$' + Number(value).toFixed(2) : ''
     }
-  }/*,
-  { 
-    title: 'Maintenance Margin Change', 
-    field: 'maintenance_margin_change', 
-    minWidth: 100, 
-    hozAlign: 'right', 
-    headerHozAlign: 'right',
-    formatter: (cell: any) => {
-      const value = cell.getValue()
-      if (value === null || value === undefined || value === '') return '-'
-      const numValue = parseFloat(value.replace(/,/g, ''))
-      const color = numValue < 0 ? '#dc3545' : numValue > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${numValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
-    },
-    bottomCalc: 'sum',
-    bottomCalcFormatter: (cell: any) => {
-      const value = cell.getValue()
-      if (value === null || value === undefined || isNaN(value)) return '-'
-      const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
-    }
-  }*/
+  }
 ]
 
 // Initialize Tabulator with composable
