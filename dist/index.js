@@ -4,12 +4,12 @@ var v = (l, e, t) => Mt(l, typeof e != "symbol" ? e + "" : e, t);
 import { inject as Lt, ref as he, watch as Ke, nextTick as be, onBeforeUnmount as tt, defineComponent as St, onMounted as Dt, createElementBlock as ee, openBlock as te, createElementVNode as $, createCommentVNode as qe, unref as J, toDisplayString as Ye, createTextVNode as zt } from "vue";
 import { useQueryClient as Ft, useQuery as Ht } from "@tanstack/vue-query";
 const Pt = Symbol.for("y2kfund.supabase");
-function Ot() {
+function At() {
   const l = Lt(Pt, null);
   if (!l) throw new Error("[@y2kfund/core] Supabase client not found. Did you install createCore()?");
   return l;
 }
-async function At(l, e) {
+async function Ot(l, e) {
   if (!e)
     return console.log("⚠️ No userId provided, showing all positions"), [];
   try {
@@ -27,7 +27,7 @@ async function At(l, e) {
 }
 async function _t(l, e, t) {
   var i;
-  const s = await At(l, t);
+  const s = await Ot(l, t);
   console.log("🔍 Querying call positions with:", {
     symbolRoot: e,
     userId: t || "none",
@@ -68,7 +68,7 @@ async function _t(l, e, t) {
   return console.log("✅ Enriched call positions with accounts", g.length), g;
 }
 function Bt(l, e) {
-  const t = Ot(), i = Ft(), s = ["callPositions", l, e], n = Ht({
+  const t = At(), i = Ft(), s = ["callPositions", l, e], n = Ht({
     queryKey: s,
     queryFn: async () => l ? await _t(t, l, e) : [],
     enabled: !!l,
@@ -596,7 +596,7 @@ var Ut = {
     actions: Jt
   }
 };
-const A = class A extends w {
+const O = class O extends w {
   constructor(e) {
     super(e), this.mode = !0, this.pasteParser = function() {
     }, this.pasteAction = function() {
@@ -646,7 +646,7 @@ const A = class A extends w {
   setPasteAction(e) {
     switch (typeof e) {
       case "string":
-        this.pasteAction = A.pasteActions[e], this.pasteAction || console.warn("Clipboard Error - No such paste action found:", e);
+        this.pasteAction = O.pasteActions[e], this.pasteAction || console.warn("Clipboard Error - No such paste action found:", e);
         break;
       case "function":
         this.pasteAction = e;
@@ -656,7 +656,7 @@ const A = class A extends w {
   setPasteParser(e) {
     switch (typeof e) {
       case "string":
-        this.pasteParser = A.pasteParsers[e], this.pasteParser || console.warn("Clipboard Error - No such paste parser found:", e);
+        this.pasteParser = O.pasteParsers[e], this.pasteParser || console.warn("Clipboard Error - No such paste parser found:", e);
         break;
       case "function":
         this.pasteParser = e;
@@ -682,9 +682,9 @@ const A = class A extends w {
     return window.clipboardData && window.clipboardData.getData ? t = window.clipboardData.getData("Text") : e.clipboardData && e.clipboardData.getData ? t = e.clipboardData.getData("text/plain") : e.originalEvent && e.originalEvent.clipboardData.getData && (t = e.originalEvent.clipboardData.getData("text/plain")), t;
   }
 };
-v(A, "moduleName", "clipboard"), v(A, "moduleExtensions", Kt), //load defaults
-v(A, "pasteActions", Ut), v(A, "pasteParsers", Xt);
-let Ee = A;
+v(O, "moduleName", "clipboard"), v(O, "moduleExtensions", Kt), //load defaults
+v(O, "pasteActions", Ut), v(O, "pasteParsers", Xt);
+let Ee = O;
 class qt {
   constructor(e) {
     return this._row = e, new Proxy(this, {
@@ -4217,10 +4217,10 @@ function Pi(l, e = {}, t) {
     s.appendChild(p), p.appendChild(f), u && p.appendChild(g);
   }), "";
 }
-function Oi(l, e, t) {
+function Ai(l, e, t) {
   return l.getElement().style.backgroundColor = this.sanitizeHTML(l.getValue()), "";
 }
-function Ai(l, e, t) {
+function Oi(l, e, t) {
   return '<svg enable-background="new 0 0 24 24" height="14" width="14" viewBox="0 0 24 24" xml:space="preserve" ><path fill="#2DC214" clip-rule="evenodd" d="M21.652,3.211c-0.293-0.295-0.77-0.295-1.061,0L9.41,14.34  c-0.293,0.297-0.771,0.297-1.062,0L3.449,9.351C3.304,9.203,3.114,9.13,2.923,9.129C2.73,9.128,2.534,9.201,2.387,9.351  l-2.165,1.946C0.078,11.445,0,11.63,0,11.823c0,0.194,0.078,0.397,0.223,0.544l4.94,5.184c0.292,0.296,0.771,0.776,1.062,1.07  l2.124,2.141c0.292,0.293,0.769,0.293,1.062,0l14.366-14.34c0.293-0.294,0.293-0.777,0-1.071L21.652,3.211z" fill-rule="evenodd"/></svg>';
 }
 function _i(l, e, t) {
@@ -4282,8 +4282,8 @@ var ji = {
   star: Fi,
   traffic: Hi,
   progress: Pi,
-  color: Oi,
-  buttonTick: Ai,
+  color: Ai,
+  buttonTick: Oi,
   buttonCross: _i,
   toggle: Bi,
   rownum: Vi,
@@ -6537,7 +6537,7 @@ const D = class D extends w {
 };
 v(D, "moduleName", "persistence"), v(D, "moduleInitOrder", -10), //load defaults
 v(D, "readers", ds), v(D, "writers", us);
-let Oe = D;
+let Ae = D;
 class mt extends w {
   constructor(e) {
     super(e), this.columnSubscribers = {}, this.registerTableOption("rowContextPopup", !1), this.registerTableOption("rowClickPopup", !1), this.registerTableOption("rowDblClickPopup", !1), this.registerTableOption("groupContextPopup", !1), this.registerTableOption("groupClickPopup", !1), this.registerTableOption("groupDblClickPopup", !1), this.registerColumnOption("headerContextPopup"), this.registerColumnOption("headerClickPopup"), this.registerColumnOption("headerDblClickPopup"), this.registerColumnOption("headerPopup"), this.registerColumnOption("headerPopupIcon"), this.registerColumnOption("contextPopup"), this.registerColumnOption("clickPopup"), this.registerColumnOption("dblClickPopup"), this.registerComponentFunction("cell", "popup", this._componentPopupCall.bind(this)), this.registerComponentFunction("column", "popup", this._componentPopupCall.bind(this)), this.registerComponentFunction("row", "popup", this._componentPopupCall.bind(this)), this.registerComponentFunction("group", "popup", this._componentPopupCall.bind(this));
@@ -6993,7 +6993,7 @@ var fs = {
     }
   }
 };
-class Ae extends w {
+class Oe extends w {
   constructor(e) {
     super(e), this.columns = [], this.hiddenColumns = [], this.mode = "", this.index = 0, this.collapseFormatter = [], this.collapseStartOpen = !0, this.collapseHandleColumn = !1, this.registerTableOption("responsiveLayout", !1), this.registerTableOption("responsiveLayoutCollapseStartOpen", !0), this.registerTableOption("responsiveLayoutCollapseUseFormatters", !0), this.registerTableOption("responsiveLayoutCollapseFormatter", !1), this.registerColumnOption("responsive");
   }
@@ -7128,7 +7128,7 @@ class Ae extends w {
     }), Object.keys(e).length ? t : "";
   }
 }
-v(Ae, "moduleName", "responsiveLayout"), v(Ae, "moduleExtensions", fs);
+v(Oe, "moduleName", "responsiveLayout"), v(Oe, "moduleExtensions", fs);
 function ps(l, e, t) {
   var i = document.createElement("input"), s = !1;
   if (i.type = "checkbox", i.setAttribute("aria-label", "Select Row"), this.table.modExists("selectRow", !0))
@@ -8525,7 +8525,7 @@ class Rt extends w {
   }
 }
 v(Rt, "moduleName", "tooltip");
-var Os = {
+var As = {
   //is integer
   integer: function(l, e, t) {
     return e === "" || e === null || typeof e > "u" ? !0 : (e = Number(e), !isNaN(e) && isFinite(e) && Math.floor(e) === e);
@@ -8717,7 +8717,7 @@ const oe = class oe extends w {
   }
 };
 v(oe, "moduleName", "validate"), //load defaults
-v(oe, "validators", Os);
+v(oe, "validators", As);
 let Ve = oe;
 var ge = /* @__PURE__ */ Object.freeze({
   __proto__: null,
@@ -8744,21 +8744,21 @@ var ge = /* @__PURE__ */ Object.freeze({
   MoveRowsModule: Fe,
   MutatorModule: He,
   PageModule: Pe,
-  PersistenceModule: Oe,
+  PersistenceModule: Ae,
   PopupModule: mt,
   PrintModule: gt,
   ReactiveDataModule: bt,
   ResizeColumnsModule: vt,
   ResizeRowsModule: wt,
   ResizeTableModule: Ct,
-  ResponsiveLayoutModule: Ae,
+  ResponsiveLayoutModule: Oe,
   SelectRangeModule: de,
   SelectRowModule: _e,
   SortModule: Be,
   SpreadsheetModule: Et,
   TooltipModule: Rt,
   ValidateModule: Ve
-}), As = {
+}), Os = {
   debugEventsExternal: !1,
   //flag to console log events
   debugEventsInternal: !1,
@@ -10813,15 +10813,15 @@ class nn extends M {
     this.dispatch("alert-hide", this.type), this.element.parentNode && this.element.parentNode.removeChild(this.element), this.msgElement.classList.remove(this._typeClass());
   }
 }
-const O = class O extends Ge {
+const A = class A extends Ge {
   static extendModule() {
-    O.initializeModuleBinder(), O._extendModule(...arguments);
+    A.initializeModuleBinder(), A._extendModule(...arguments);
   }
   static registerModule() {
-    O.initializeModuleBinder(), O._registerModule(...arguments);
+    A.initializeModuleBinder(), A._registerModule(...arguments);
   }
   constructor(e, t, i) {
-    super(), O.initializeModuleBinder(i), this.options = {}, this.columnManager = null, this.rowManager = null, this.footerManager = null, this.alertManager = null, this.vdomHoz = null, this.externalEvents = null, this.eventBus = null, this.interactionMonitor = !1, this.browser = "", this.browserSlow = !1, this.browserMobile = !1, this.rtl = !1, this.originalElement = null, this.componentFunctionBinder = new Us(this), this.dataLoader = !1, this.modules = {}, this.modulesCore = [], this.modulesRegular = [], this.deprecationAdvisor = new Ks(this), this.optionsList = new xt(this, "table constructor"), this.dependencyRegistry = new qs(this), this.initialized = !1, this.destroyed = !1, this.initializeElement(e) && (this.initializeCoreSystems(t), setTimeout(() => {
+    super(), A.initializeModuleBinder(i), this.options = {}, this.columnManager = null, this.rowManager = null, this.footerManager = null, this.alertManager = null, this.vdomHoz = null, this.externalEvents = null, this.eventBus = null, this.interactionMonitor = !1, this.browser = "", this.browserSlow = !1, this.browserMobile = !1, this.rtl = !1, this.originalElement = null, this.componentFunctionBinder = new Us(this), this.dataLoader = !1, this.modules = {}, this.modulesCore = [], this.modulesRegular = [], this.deprecationAdvisor = new Ks(this), this.optionsList = new xt(this, "table constructor"), this.dependencyRegistry = new qs(this), this.initialized = !1, this.destroyed = !1, this.initializeElement(e) && (this.initializeCoreSystems(t), setTimeout(() => {
       this._create();
     })), this.constructor.registry.register(this);
   }
@@ -10829,7 +10829,7 @@ const O = class O extends Ge {
     return typeof HTMLElement < "u" && e instanceof HTMLElement ? (this.element = e, !0) : typeof e == "string" ? (this.element = document.querySelector(e), this.element ? !0 : (console.error("Tabulator Creation Error - no element found matching selector: ", e), !1)) : (console.error("Tabulator Creation Error - Invalid element provided:", e), !1);
   }
   initializeCoreSystems(e) {
-    this.columnManager = new Vs(this), this.rowManager = new Ws(this), this.footerManager = new Gs(this), this.dataLoader = new Xs(this), this.alertManager = new nn(this), this._bindModules(), this.options = this.optionsList.generate(O.defaultOptions, e), this._clearObjectPointers(), this._mapDeprecatedFunctionality(), this.externalEvents = new $s(this, this.options, this.options.debugEventsExternal), this.eventBus = new Js(this.options.debugEventsInternal), this.interactionMonitor = new js(this), this.dataLoader.initialize(), this.footerManager.initialize(), this.dependencyRegistry.initialize();
+    this.columnManager = new Vs(this), this.rowManager = new Ws(this), this.footerManager = new Gs(this), this.dataLoader = new Xs(this), this.alertManager = new nn(this), this._bindModules(), this.options = this.optionsList.generate(A.defaultOptions, e), this._clearObjectPointers(), this._mapDeprecatedFunctionality(), this.externalEvents = new $s(this, this.options, this.options.debugEventsExternal), this.eventBus = new Js(this.options.debugEventsInternal), this.interactionMonitor = new js(this), this.dataLoader.initialize(), this.footerManager.initialize(), this.dependencyRegistry.initialize();
   }
   //convert deprecated functionality to new functions
   _mapDeprecatedFunctionality() {
@@ -11121,8 +11121,8 @@ const O = class O extends Ge {
   }
 };
 //default setup options
-v(O, "defaultOptions", As);
-let je = O;
+v(A, "defaultOptions", Os);
+let je = A;
 var ie = je;
 class rn extends ie {
   static extendModule() {
@@ -11221,6 +11221,12 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       return `20${d}-${u}-${c}`;
     }
     const n = [
+      {
+        title: "Account",
+        field: "legal_entity",
+        minWidth: 100,
+        headerHozAlign: "left"
+      },
       {
         title: "Strike price",
         field: "strike_price",
@@ -11378,7 +11384,7 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-46bce4bd"]]);
+}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-02e18aa9"]]);
 export {
   yn as callPositions,
   yn as default

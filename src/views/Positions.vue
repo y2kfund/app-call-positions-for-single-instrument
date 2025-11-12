@@ -44,6 +44,12 @@ function formatExpiryFromYyMmDd(code: string): string {
 
 // Define columns
 const columns: ColumnDefinition[] = [
+  {
+    title: 'Account', 
+    field: 'legal_entity', 
+    minWidth: 100, 
+    headerHozAlign: 'left'
+  },
   { title: 'Strike price', field: 'strike_price', minWidth: 100, hozAlign: 'left', headerHozAlign: 'left',
     formatter: (cell: any) => {
       const row = cell.getRow().getData()
