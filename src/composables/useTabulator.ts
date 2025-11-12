@@ -1,100 +1,99 @@
-import { ref, watch, nextTick, onBeforeUnmount, type Ref } from 'vue'
-import { TabulatorFull as Tabulator, type ColumnDefinition } from 'tabulator-tables'
+import { ref, watch, nextTick, type Ref, type ComputedRef } from 'vue'
+import { TabulatorFull as Tabulator } from 'tabulator-tables'
+import type { ColumnDefinition, Options } from 'tabulator-tables'
 
-export interface UseTabulatorOptions {
-  data: Ref<any[] | undefined>
+interface UseTabulatorOptions {
+  data: ComputedRef<any[] | undefined>
   columns: ColumnDefinition[]
-  isSuccess: Ref<boolean>
-  layout?: 'fitData' | 'fitColumns' | 'fitDataFill' | 'fitDataStretch' | 'fitDataTable'
-  height?: string | number
+  isSuccess: ComputedRef<boolean>
   placeholder?: string
+  rowFormatter?: (row: any) => void | Promise<void>
 }
 
 export function useTabulator(options: UseTabulatorOptions) {
+  const { data, columns, isSuccess, placeholder = 'No data available', rowFormatter } = options
+  
   const tableDiv = ref<HTMLDivElement | null>(null)
-  let tabulator: Tabulator | null = null
-  const isTabulatorReady = ref(false)
   const isTableInitialized = ref(false)
+  const tabulator = ref<Tabulator | null>(null)
 
   function initializeTabulator() {
-    if (!tableDiv.value || !options.data.value) {
-      console.log('⚠️ Cannot initialize: tableDiv or data missing')
+    if (!tableDiv.value || isTableInitialized.value) {
+      console.log('⚠️ Cannot initialize: div exists?', !!tableDiv.value, 'already initialized?', isTableInitialized.value)
       return
     }
 
-    // Destroy existing table
-    if (tabulator) {
-      try {
-        tabulator.destroy()
-        console.log('🗑️ Destroyed existing tabulator')
-      } catch (error) {
-        console.warn('Error destroying tabulator:', error)
-      }
-      tabulator = null
+    // Check if element is visible
+    if (tableDiv.value.offsetParent === null) {
+      console.log('⚠️ Table div is not visible, skipping initialization')
+      return
     }
 
-    isTabulatorReady.value = false
+    console.log('🚀 Initializing Tabulator with data:', data.value?.length, 'rows')
 
-    console.log('🚀 Initializing Tabulator with', options.data.value.length, 'rows')
-
-    try {
-      tabulator = new Tabulator(tableDiv.value, {
-        data: options.data.value,
-        layout: options.layout || 'fitColumns',
-        height: options.height || '100%',
-        resizableColumns: true,
-        placeholder: options.placeholder || 'No data available',
-        headerSortElement: '<span></span>',
-        columns: options.columns
-      })
-
-      isTabulatorReady.value = true
-      console.log('✅ Tabulator initialized successfully')
-    } catch (error) {
-      console.error('❌ Error creating Tabulator:', error)
+    const config: Options = {
+      data: data.value || [],
+      columns,
+      layout: 'fitColumns',
+      placeholder,
+      height: '100%',
+      reactiveData: true,
     }
+
+    if (rowFormatter) {
+      config.rowFormatter = rowFormatter
+    }
+
+    tabulator.value = new Tabulator(tableDiv.value, config)
+    isTableInitialized.value = true
+
+    console.log('✅ Tabulator initialized')
   }
 
-  // Watch for BOTH data ready AND DOM ready
-  watch([() => options.isSuccess.value, tableDiv], async ([isSuccess, divRef]) => {
-    console.log('👀 Watch triggered - isSuccess:', isSuccess, 'divRef:', !!divRef, 'isTableInitialized:', isTableInitialized.value)
+  // Watch for both success state AND when the element becomes available
+  watch(
+    [isSuccess, tableDiv],
+    async ([success, element]) => {
+      console.log('👀 Tabulator watch triggered:', { success, hasElement: !!element, initialized: isTableInitialized.value })
+      
+      if (success && element && !isTableInitialized.value) {
+        // Wait for element to be visible in DOM
+        await nextTick()
+        
+        // Check if element is now visible
+        if (element.offsetParent !== null) {
+          console.log('🚀 Initializing from watcher')
+          initializeTabulator()
+        } else {
+          console.log('⏸️ Element not visible yet, will retry')
+          // Set up a short retry mechanism
+          setTimeout(() => {
+            if (element.offsetParent !== null && !isTableInitialized.value) {
+              console.log('🚀 Initializing after visibility check')
+              initializeTabulator()
+            }
+          }, 100)
+        }
+      }
+    },
+    { immediate: true }
+  )
 
-    if (isSuccess && divRef && !isTableInitialized.value) {
-      await nextTick()
-      console.log('🎯 Conditions met, initializing table with', options.data.value?.length, 'rows')
-      initializeTabulator()
-      isTableInitialized.value = true
+  // Watch for data changes
+  watch(
+    () => data.value,
+    (newData) => {
+      if (tabulator.value && newData) {
+        console.log('🔄 Updating Tabulator data:', newData.length, 'rows')
+        tabulator.value.setData(newData)
+      }
     }
-  }, { immediate: true })
-
-  // Watch for data changes after initialization
-  watch(() => options.data.value, async (newData) => {
-    if (!tabulator || !newData) return
-
-    console.log('🔄 Data changed, updating table with', newData.length, 'rows')
-
-    try {
-      await nextTick()
-      tabulator.replaceData(newData)
-    } catch (error) {
-      console.warn('Error updating table data:', error)
-      // If there's an error, rebuild the table
-      initializeTabulator()
-    }
-  }, { deep: true })
-
-  onBeforeUnmount(() => {
-    console.log('👋 Cleaning up tabulator')
-    if (tabulator) {
-      tabulator.destroy()
-    }
-  })
+  )
 
   return {
     tableDiv,
-    tabulator: ref(tabulator),
-    isTabulatorReady,
-    isTableInitialized,
-    initializeTabulator
+    tabulator,
+    initializeTabulator,
+    isTableInitialized
   }
 }

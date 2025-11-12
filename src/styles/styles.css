@@ -43,7 +43,58 @@
 .tabulator-row.tabulator-row-even {
   background-color: #fff;
 }
-
-.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title {
-  padding-right: 0 !important;
+.expand-arrow {
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+  width: 16px;
+  text-align: center;
+  color: #666;
+  transition: transform 0.2s;
 }
+
+.expand-arrow.expanded {
+  transform: rotate(0deg);
+}
+
+.trade-count {
+  color: #6c757d;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.nested-tables-container {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+
+.fi-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 0 4px 4px 0;
+  background: #e9ecef;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.trade-side-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85em;
+}
+
+.trade-buy {
+  background: #d4edda;
+  color: #155724;
+}
+
+.trade-sell {
+  background: #f8d7da;
+  color: #721c24;
+}
+/*.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title {
+  padding-right: 0 !important;
+}*/
