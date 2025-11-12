@@ -43,3 +43,7 @@
 .tabulator-row.tabulator-row-even {
   background-color: #fff;
 }
+
+.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title {
+  margin-right: 0 !important;
+}
