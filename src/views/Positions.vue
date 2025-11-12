@@ -71,7 +71,7 @@ const columns: ColumnDefinition[] = [
     }
   },
   { 
-    title: 'Accounting Quantity', 
+    title: 'Accounting<br>Quantity', 
     field: 'accounting_quantity', 
     minWidth: 100, 
     hozAlign: 'right', 
@@ -91,7 +91,7 @@ const columns: ColumnDefinition[] = [
     }
   },
   {
-    title: 'Premium received per unit when the option was sold', 
+    title: 'Premium received per unit<br>when option was sold', 
     field: 'avgPrice', 
     minWidth: 100, 
     hozAlign: 'right',
