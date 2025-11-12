@@ -47,10 +47,15 @@ const columns: ColumnDefinition[] = [
   {
     title: 'Account', 
     field: 'legal_entity', 
-    minWidth: 100, 
-    headerHozAlign: 'left'
+    headerHozAlign: 'left',
+    widthGrow: 1
   },
-  { title: 'Strike price', field: 'strike_price', minWidth: 100, hozAlign: 'left', headerHozAlign: 'left',
+  { 
+    title: 'Strike price', 
+    field: 'strike_price', 
+    hozAlign: 'left', 
+    headerHozAlign: 'left',
+    widthGrow: 1,
     formatter: (cell: any) => {
       const row = cell.getRow().getData()
       if (row.asset_class === 'OPT') {
@@ -60,7 +65,12 @@ const columns: ColumnDefinition[] = [
       return '<span style="color:#aaa;font-style:italic;">Not applicable</span>'
     }
   },
-  { title: 'Expiry Date', field: 'expiry_date', minWidth: 100, hozAlign: 'left', headerHozAlign: 'left',
+  { 
+    title: 'Expiry Date', 
+    field: 'expiry_date', 
+    hozAlign: 'left', 
+    headerHozAlign: 'left',
+    widthGrow: 1,
     formatter: (cell: any) => {
       const row = cell.getRow().getData()
       if (row.asset_class === 'OPT') {
@@ -73,9 +83,9 @@ const columns: ColumnDefinition[] = [
   { 
     title: 'Accounting<br>Quantity', 
     field: 'accounting_quantity', 
-    minWidth: 100, 
     hozAlign: 'right', 
-    headerHozAlign: 'right', 
+    headerHozAlign: 'right',
+    widthGrow: 1.5,
     formatter: 'money',
     formatterParams: {
       decimal: '.',
@@ -93,8 +103,8 @@ const columns: ColumnDefinition[] = [
   {
     title: 'Premium received per unit<br>when option was sold', 
     field: 'avgPrice', 
-    minWidth: 100, 
     hozAlign: 'right',
+    widthGrow: 2,
     formatter: (cell: any) => {
       const value = cell.getValue()
       if (value == null) return ''
@@ -105,9 +115,9 @@ const columns: ColumnDefinition[] = [
   { 
     title: 'Market Value', 
     field: 'market_value', 
-    minWidth: 100, 
     hozAlign: 'right', 
     headerHozAlign: 'right',
+    widthGrow: 1.5,
     formatter: (cell: any) => {
       const value = cell.getValue()
       if (value == null) return ''
@@ -124,9 +134,9 @@ const columns: ColumnDefinition[] = [
   { 
     title: 'Unrealized P&L', 
     field: 'unrealized_pnl', 
-    minWidth: 100, 
     hozAlign: 'right', 
     headerHozAlign: 'right',
+    widthGrow: 1.5,
     formatter: (cell: any) => {
       const value = cell.getValue()
       if (value == null) return ''
@@ -143,9 +153,9 @@ const columns: ColumnDefinition[] = [
   { 
     title: 'Entry Cash Flow', 
     field: 'computed_cash_flow_on_entry', 
-    minWidth: 100, 
     hozAlign: 'right', 
     headerHozAlign: 'right',
+    widthGrow: 1.5,
     formatter: (cell: any) => {
       const value = cell.getValue()
       if (value == null) return ''
@@ -159,7 +169,12 @@ const columns: ColumnDefinition[] = [
       return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
     }
   },
-  { title: 'Break even price', field: 'computed_be_price', minWidth: 100, hozAlign: 'right', headerHozAlign: 'right',
+  { 
+    title: 'Break even price', 
+    field: 'computed_be_price', 
+    hozAlign: 'right', 
+    headerHozAlign: 'right',
+    widthGrow: 1.5,
     formatter: (cell: any) => {
       const value = cell.getValue()
       return value != null ? '$' + Number(value).toFixed(2) : ''

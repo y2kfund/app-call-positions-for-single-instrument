@@ -11224,15 +11224,15 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       {
         title: "Account",
         field: "legal_entity",
-        minWidth: 100,
-        headerHozAlign: "left"
+        headerHozAlign: "left",
+        widthGrow: 1
       },
       {
         title: "Strike price",
         field: "strike_price",
-        minWidth: 100,
         hozAlign: "left",
         headerHozAlign: "left",
+        widthGrow: 1,
         formatter: (h) => {
           const d = h.getRow().getData();
           return d.asset_class === "OPT" ? i(d.symbol)[2] || '<span style="color:#aaa;font-style:italic;">Unknown</span>' : '<span style="color:#aaa;font-style:italic;">Not applicable</span>';
@@ -11241,9 +11241,9 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       {
         title: "Expiry Date",
         field: "expiry_date",
-        minWidth: 100,
         hozAlign: "left",
         headerHozAlign: "left",
+        widthGrow: 1,
         formatter: (h) => {
           const d = h.getRow().getData();
           return d.asset_class === "OPT" ? i(d.symbol)[1] || '<span style="color:#aaa;font-style:italic;">Unknown</span>' : '<span style="color:#aaa;font-style:italic;">Not applicable</span>';
@@ -11252,9 +11252,9 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       {
         title: "Accounting<br>Quantity",
         field: "accounting_quantity",
-        minWidth: 100,
         hozAlign: "right",
         headerHozAlign: "right",
+        widthGrow: 1.5,
         formatter: "money",
         formatterParams: {
           decimal: ".",
@@ -11272,8 +11272,8 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       {
         title: "Premium received per unit<br>when option was sold",
         field: "avgPrice",
-        minWidth: 100,
         hozAlign: "right",
+        widthGrow: 2,
         formatter: (h) => {
           const d = h.getValue();
           return d == null ? "" : `<span style="color:${d < 0 ? "#dc3545" : d > 0 ? "#28a745" : "#000"}">$${Number(d).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
@@ -11282,9 +11282,9 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       {
         title: "Market Value",
         field: "market_value",
-        minWidth: 100,
         hozAlign: "right",
         headerHozAlign: "right",
+        widthGrow: 1.5,
         formatter: (h) => {
           const d = h.getValue();
           return d == null ? "" : `<span style="color:${d < 0 ? "#dc3545" : d > 0 ? "#28a745" : "#000"}">$${Number(d).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
@@ -11298,9 +11298,9 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       {
         title: "Unrealized P&L",
         field: "unrealized_pnl",
-        minWidth: 100,
         hozAlign: "right",
         headerHozAlign: "right",
+        widthGrow: 1.5,
         formatter: (h) => {
           const d = h.getValue();
           return d == null ? "" : `<span style="color:${d < 0 ? "#dc3545" : d > 0 ? "#28a745" : "#000"}">$${Number(d).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
@@ -11314,9 +11314,9 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       {
         title: "Entry Cash Flow",
         field: "computed_cash_flow_on_entry",
-        minWidth: 100,
         hozAlign: "right",
         headerHozAlign: "right",
+        widthGrow: 1.5,
         formatter: (h) => {
           const d = h.getValue();
           return d == null ? "" : `<span style="color:${d < 0 ? "#dc3545" : d > 0 ? "#28a745" : "#000"}">$${Number(d).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
@@ -11330,9 +11330,9 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       {
         title: "Break even price",
         field: "computed_be_price",
-        minWidth: 100,
         hozAlign: "right",
         headerHozAlign: "right",
+        widthGrow: 1.5,
         formatter: (h) => {
           const d = h.getValue();
           return d != null ? "$" + Number(d).toFixed(2) : "";
@@ -11384,7 +11384,7 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-68ecd4ff"]]);
+}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-86bc3b99"]]);
 export {
   yn as callPositions,
   yn as default
