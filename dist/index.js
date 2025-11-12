@@ -1,7 +1,7 @@
 var kt = Object.defineProperty;
 var Mt = (l, e, t) => e in l ? kt(l, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : l[e] = t;
 var v = (l, e, t) => Mt(l, typeof e != "symbol" ? e + "" : e, t);
-import { inject as Lt, ref as he, watch as qe, nextTick as ve, onBeforeUnmount as tt, defineComponent as St, onMounted as Dt, createElementBlock as ee, openBlock as te, createElementVNode as J, createCommentVNode as Ye, toDisplayString as me, unref as $, createTextVNode as zt } from "vue";
+import { inject as Lt, ref as he, watch as Ke, nextTick as be, onBeforeUnmount as tt, defineComponent as St, onMounted as Dt, createElementBlock as ee, openBlock as te, createElementVNode as J, createCommentVNode as qe, unref as $, toDisplayString as Ye, createTextVNode as zt } from "vue";
 import { useQueryClient as Ft, useQuery as Ht } from "@tanstack/vue-query";
 const Pt = Symbol.for("y2kfund.supabase");
 function Ot() {
@@ -428,25 +428,25 @@ const q = class q extends w {
 };
 v(q, "moduleName", "accessor"), //load defaults
 v(q, "accessors", It);
-let we = q;
+let ve = q;
 var Nt = {
   method: "GET"
 };
-function Ce(l, e) {
+function we(l, e) {
   var t = [];
   if (e = e || "", Array.isArray(l))
     l.forEach((s, n) => {
-      t = t.concat(Ce(s, e ? e + "[" + n + "]" : n));
+      t = t.concat(we(s, e ? e + "[" + n + "]" : n));
     });
   else if (typeof l == "object")
     for (var i in l)
-      t = t.concat(Ce(l[i], e ? e + "[" + i + "]" : i));
+      t = t.concat(we(l[i], e ? e + "[" + i + "]" : i));
   else
     t.push({ key: e, value: l });
   return t;
 }
 function Wt(l) {
-  var e = Ce(l), t = [];
+  var e = we(l), t = [];
   return e.forEach(function(i) {
     t.push(encodeURIComponent(i.key) + "=" + encodeURIComponent(i.value));
   }), t.join("&");
@@ -475,15 +475,15 @@ function Gt(l, e, t) {
     })) : (console.warn("Ajax Load Error - No URL Set"), s([]));
   });
 }
-function ye(l, e) {
+function Ce(l, e) {
   var t = [];
   if (e = e || "", Array.isArray(l))
     l.forEach((s, n) => {
-      t = t.concat(ye(s, e ? e + "[" + n + "]" : n));
+      t = t.concat(Ce(s, e ? e + "[" + n + "]" : n));
     });
   else if (typeof l == "object")
     for (var i in l)
-      t = t.concat(ye(l[i], e ? e + "[" + i + "]" : i));
+      t = t.concat(Ce(l[i], e ? e + "[" + i + "]" : i));
   else
     t.push({ key: e, value: l });
   return t;
@@ -500,7 +500,7 @@ var jt = {
   form: {
     headers: {},
     body: function(l, e, t) {
-      var i = ye(t), s = new FormData();
+      var i = Ce(t), s = new FormData();
       return i.forEach(function(n) {
         s.append(n.key, n.value);
       }), s;
@@ -550,7 +550,7 @@ const H = class H extends w {
 };
 v(H, "moduleName", "ajax"), //load defaults
 v(H, "defaultConfig", Nt), v(H, "defaultURLGenerator", st), v(H, "defaultLoaderPromise", Gt), v(H, "contentTypeFormatters", jt);
-let Ee = H;
+let ye = H;
 var Ut = {
   replace: function(l) {
     return this.table.setData(l);
@@ -684,7 +684,7 @@ const A = class A extends w {
 };
 v(A, "moduleName", "clipboard"), v(A, "moduleExtensions", Kt), //load defaults
 v(A, "pasteActions", Ut), v(A, "pasteParsers", Xt);
-let Re = A;
+let Ee = A;
 class qt {
   constructor(e) {
     return this._row = e, new Proxy(this, {
@@ -1863,7 +1863,7 @@ const _ = class _ extends w {
 };
 v(_, "moduleName", "columnCalcs"), //load defaults
 v(_, "calculations", Yt);
-let xe = _;
+let Re = _;
 class at extends w {
   constructor(e) {
     super(e), this.indent = 10, this.field = "", this.collapseEl = null, this.expandEl = null, this.branchEl = null, this.elementField = !1, this.startOpen = function() {
@@ -2263,7 +2263,7 @@ const Y = class Y extends w {
 };
 v(Y, "moduleName", "download"), //load defaults
 v(Y, "downloaders", ni);
-let Te = Y;
+let xe = Y;
 function ce(l, e) {
   var t = e.mask, i = typeof e.maskLetterChar < "u" ? e.maskLetterChar : "A", s = typeof e.maskNumberChar < "u" ? e.maskNumberChar : "9", n = typeof e.maskWildcardChar < "u" ? e.maskWildcardChar : "*";
   function r(o) {
@@ -3343,13 +3343,13 @@ const se = class se extends w {
 };
 v(se, "moduleName", "edit"), //load defaults
 v(se, "editors", vi);
-let ke = se;
+let Te = se;
 class Qe {
   constructor(e, t, i, s) {
     this.type = e, this.columns = t, this.component = i || !1, this.indent = s || 0;
   }
 }
-class ge {
+class me {
   constructor(e, t, i, s, n) {
     this.value = e, this.component = t || !1, this.width = i, this.height = s, this.depth = n;
   }
@@ -3444,7 +3444,7 @@ const B = class B extends w {
       r.forEach((a) => {
         if (a) {
           let h = typeof a.title > "u" ? "" : a.title;
-          o.push(new ge(h, a.column.getComponent(), a.width, a.height, a.depth));
+          o.push(new me(h, a.column.getComponent(), a.width, a.height, a.depth));
         } else
           o.push(null);
       }), s.push(new Qe("header", o));
@@ -3468,12 +3468,12 @@ const B = class B extends w {
       var r = s.getData(this.colVisProp), o = [], a = 0;
       switch (s.type) {
         case "group":
-          a = s.level, o.push(new ge(s.key, s.getComponent(), t.length, 1));
+          a = s.level, o.push(new me(s.key, s.getComponent(), t.length, 1));
           break;
         case "calc":
         case "row":
           t.forEach((h) => {
-            o.push(new ge(h._column.getFieldValue(r), h, 1, 1));
+            o.push(new me(h._column.getFieldValue(r), h, 1, 1));
           }), this.table.options.dataTree && this.config.dataTree !== !1 && (a = s.modules.dataTree.index);
           break;
       }
@@ -3618,7 +3618,7 @@ const B = class B extends w {
   }
 };
 v(B, "moduleName", "export"), v(B, "columnLookups", wi), v(B, "rowLookups", Ci);
-let Me = B;
+let ke = B;
 var yi = {
   //equal to
   "=": function(l, e, t, i) {
@@ -4031,7 +4031,7 @@ const P = class P extends w {
 };
 v(P, "moduleName", "filter"), //load defaults
 v(P, "filters", yi);
-let Le = P;
+let Me = P;
 function Ei(l, e, t) {
   return this.emptyToSpace(this.sanitizeHTML(l.getValue()));
 }
@@ -4388,7 +4388,7 @@ const V = class V extends w {
 };
 v(V, "moduleName", "format"), //load defaults
 v(V, "formatters", ji);
-let Se = V;
+let Le = V;
 class lt extends w {
   constructor(e) {
     super(e), this.leftColumns = [], this.rightColumns = [], this.initializationMode = "left", this.active = !1, this.blocked = !0, this.registerColumnOption("frozen");
@@ -5150,7 +5150,7 @@ const I = class I extends w {
 };
 v(I, "moduleName", "history"), v(I, "moduleExtensions", qi), //load defaults
 v(I, "undoers", Xi), v(I, "redoers", Ji);
-let De = I;
+let Se = I;
 class ut extends w {
   constructor(e) {
     super(e), this.fieldIndex = [], this.hasIndex = !1;
@@ -5387,7 +5387,7 @@ const ne = class ne extends w {
 };
 v(ne, "moduleName", "import"), //load defaults
 v(ne, "importers", ts);
-let ze = ne;
+let De = ne;
 class ct extends w {
   constructor(e) {
     super(e), this.eventMap = {
@@ -5658,7 +5658,7 @@ const N = class N extends w {
 };
 v(N, "moduleName", "keybindings"), //load defaults
 v(N, "bindings", is), v(N, "actions", ss);
-let Fe = N;
+let ze = N;
 class ft extends w {
   constructor(e) {
     super(e), this.menuContainer = null, this.nestedMenuBlock = !1, this.currentComponent = null, this.rootPopup = null, this.columnSubscribers = {}, this.registerTableOption("rowContextMenu", !1), this.registerTableOption("rowClickMenu", !1), this.registerTableOption("rowDblClickMenu", !1), this.registerTableOption("groupContextMenu", !1), this.registerTableOption("groupClickMenu", !1), this.registerTableOption("groupDblClickMenu", !1), this.registerColumnOption("headerContextMenu"), this.registerColumnOption("headerClickMenu"), this.registerColumnOption("headerDblClickMenu"), this.registerColumnOption("headerMenu"), this.registerColumnOption("headerMenuIcon"), this.registerColumnOption("contextMenu"), this.registerColumnOption("clickMenu"), this.registerColumnOption("dblClickMenu");
@@ -5997,7 +5997,7 @@ const G = class G extends w {
 };
 v(G, "moduleName", "moveRow"), //load defaults
 v(G, "senders", ns), v(G, "receivers", rs);
-let He = G;
+let Fe = G;
 var os = {};
 const Q = class Q extends w {
   constructor(e) {
@@ -6065,7 +6065,7 @@ const Q = class Q extends w {
 };
 v(Q, "moduleName", "mutator"), //load defaults
 v(Q, "mutators", os);
-let Pe = Q;
+let He = Q;
 function as(l, e, t, i, s) {
   var n = document.createElement("span"), r = document.createElement("span"), o = document.createElement("span"), a = document.createElement("span"), h = document.createElement("span"), d = document.createElement("span");
   return this.table.modules.localize.langBind("pagination|counter|showing", (u) => {
@@ -6359,7 +6359,7 @@ const re = class re extends w {
 };
 v(re, "moduleName", "page"), //load defaults
 v(re, "pageCounters", hs);
-let Oe = re;
+let Pe = re;
 var ds = {
   local: function(l, e) {
     var t = localStorage.getItem(l + "-" + e);
@@ -6537,7 +6537,7 @@ const D = class D extends w {
 };
 v(D, "moduleName", "persistence"), v(D, "moduleInitOrder", -10), //load defaults
 v(D, "readers", ds), v(D, "writers", us);
-let Ae = D;
+let Oe = D;
 class mt extends w {
   constructor(e) {
     super(e), this.columnSubscribers = {}, this.registerTableOption("rowContextPopup", !1), this.registerTableOption("rowClickPopup", !1), this.registerTableOption("rowDblClickPopup", !1), this.registerTableOption("groupContextPopup", !1), this.registerTableOption("groupClickPopup", !1), this.registerTableOption("groupDblClickPopup", !1), this.registerColumnOption("headerContextPopup"), this.registerColumnOption("headerClickPopup"), this.registerColumnOption("headerDblClickPopup"), this.registerColumnOption("headerPopup"), this.registerColumnOption("headerPopupIcon"), this.registerColumnOption("contextPopup"), this.registerColumnOption("clickPopup"), this.registerColumnOption("dblClickPopup"), this.registerComponentFunction("cell", "popup", this._componentPopupCall.bind(this)), this.registerComponentFunction("column", "popup", this._componentPopupCall.bind(this)), this.registerComponentFunction("row", "popup", this._componentPopupCall.bind(this)), this.registerComponentFunction("group", "popup", this._componentPopupCall.bind(this));
@@ -6993,7 +6993,7 @@ var fs = {
     }
   }
 };
-class _e extends w {
+class Ae extends w {
   constructor(e) {
     super(e), this.columns = [], this.hiddenColumns = [], this.mode = "", this.index = 0, this.collapseFormatter = [], this.collapseStartOpen = !0, this.collapseHandleColumn = !1, this.registerTableOption("responsiveLayout", !1), this.registerTableOption("responsiveLayoutCollapseStartOpen", !0), this.registerTableOption("responsiveLayoutCollapseUseFormatters", !0), this.registerTableOption("responsiveLayoutCollapseFormatter", !1), this.registerColumnOption("responsive");
   }
@@ -7128,7 +7128,7 @@ class _e extends w {
     }), Object.keys(e).length ? t : "";
   }
 }
-v(_e, "moduleName", "responsiveLayout"), v(_e, "moduleExtensions", fs);
+v(Ae, "moduleName", "responsiveLayout"), v(Ae, "moduleExtensions", fs);
 function ps(l, e, t) {
   var i = document.createElement("input"), s = !1;
   if (i.type = "checkbox", i.setAttribute("aria-label", "Select Row"), this.table.modExists("selectRow", !0))
@@ -7154,7 +7154,7 @@ var ms = {
     }
   }
 };
-class Be extends w {
+class _e extends w {
   constructor(e) {
     super(e), this.selecting = !1, this.lastClickedRow = !1, this.selectPrev = [], this.selectedRows = [], this.headerCheckboxElement = null, this.registerTableOption("selectableRows", "highlight"), this.registerTableOption("selectableRowsRangeMode", "drag"), this.registerTableOption("selectableRowsRollingSelection", !0), this.registerTableOption("selectableRowsPersistence", !0), this.registerTableOption("selectableRowsCheck", function(t, i) {
       return !0;
@@ -7309,7 +7309,7 @@ class Be extends w {
         this._deselectRow(s, !0);
   }
 }
-v(Be, "moduleName", "selectRow"), v(Be, "moduleExtensions", ms);
+v(_e, "moduleName", "selectRow"), v(_e, "moduleExtensions", ms);
 class gs {
   constructor(e) {
     return this._range = e, new Proxy(this, {
@@ -7945,7 +7945,7 @@ function ks(l, e, t, i, s, n, r) {
   }
   return (o === "top" && n === "desc" || o === "bottom" && n === "asc") && (a *= -1), a;
 }
-function Xe(l, e, t, i, s, n, r) {
+function Ue(l, e, t, i, s, n, r) {
   var o = this.table.dependencyRegistry.lookup(["luxon", "DateTime"], "DateTime"), a = r.format || "dd/MM/yyyy HH:mm:ss", h = r.alignEmptyValues, d = 0;
   if (typeof o < "u") {
     if (o.isDateTime(l) || (a === "iso" ? l = o.fromISO(String(l)) : l = o.fromFormat(String(l), a)), o.isDateTime(e) || (a === "iso" ? e = o.fromISO(String(e)) : e = o.fromFormat(String(e), a)), !l.isValid)
@@ -7959,10 +7959,10 @@ function Xe(l, e, t, i, s, n, r) {
     console.error("Sort Error - 'datetime' sorter is dependant on luxon.js");
 }
 function Ms(l, e, t, i, s, n, r) {
-  return r.format || (r.format = "dd/MM/yyyy"), Xe.call(this, l, e, t, i, s, n, r);
+  return r.format || (r.format = "dd/MM/yyyy"), Ue.call(this, l, e, t, i, s, n, r);
 }
 function Ls(l, e, t, i, s, n, r) {
-  return r.format || (r.format = "HH:mm"), Xe.call(this, l, e, t, i, s, n, r);
+  return r.format || (r.format = "HH:mm"), Ue.call(this, l, e, t, i, s, n, r);
 }
 function Ss(l, e, t, i, s, n, r) {
   var o = l === !0 || l === "true" || l === "True" || l === 1 ? 1 : 0, a = e === !0 || e === "true" || e === "True" || e === 1 ? 1 : 0;
@@ -8035,7 +8035,7 @@ var Hs = {
   string: ks,
   date: Ms,
   time: Ls,
-  datetime: Xe,
+  datetime: Ue,
   boolean: Ss,
   array: Ds,
   exists: zs,
@@ -8223,7 +8223,7 @@ const j = class j extends w {
 };
 v(j, "moduleName", "sort"), //load defaults
 v(j, "sorters", Hs);
-let Ve = j;
+let Be = j;
 class Ps {
   constructor(e, t) {
     this.columnCount = e, this.rowCount = t, this.columnString = [], this.columns = [], this.rows = [];
@@ -8718,46 +8718,46 @@ const oe = class oe extends w {
 };
 v(oe, "moduleName", "validate"), //load defaults
 v(oe, "validators", Os);
-let Ie = oe;
-var be = /* @__PURE__ */ Object.freeze({
+let Ve = oe;
+var ge = /* @__PURE__ */ Object.freeze({
   __proto__: null,
-  AccessorModule: we,
-  AjaxModule: Ee,
-  ClipboardModule: Re,
-  ColumnCalcsModule: xe,
+  AccessorModule: ve,
+  AjaxModule: ye,
+  ClipboardModule: Ee,
+  ColumnCalcsModule: Re,
   DataTreeModule: at,
-  DownloadModule: Te,
-  EditModule: ke,
-  ExportModule: Me,
-  FilterModule: Le,
-  FormatModule: Se,
+  DownloadModule: xe,
+  EditModule: Te,
+  ExportModule: ke,
+  FilterModule: Me,
+  FormatModule: Le,
   FrozenColumnsModule: lt,
   FrozenRowsModule: ht,
   GroupRowsModule: dt,
-  HistoryModule: De,
+  HistoryModule: Se,
   HtmlTableImportModule: ut,
-  ImportModule: ze,
+  ImportModule: De,
   InteractionModule: ct,
-  KeybindingsModule: Fe,
+  KeybindingsModule: ze,
   MenuModule: ft,
   MoveColumnsModule: pt,
-  MoveRowsModule: He,
-  MutatorModule: Pe,
-  PageModule: Oe,
-  PersistenceModule: Ae,
+  MoveRowsModule: Fe,
+  MutatorModule: He,
+  PageModule: Pe,
+  PersistenceModule: Oe,
   PopupModule: mt,
   PrintModule: gt,
   ReactiveDataModule: bt,
   ResizeColumnsModule: vt,
   ResizeRowsModule: wt,
   ResizeTableModule: Ct,
-  ResponsiveLayoutModule: _e,
+  ResponsiveLayoutModule: Ae,
   SelectRangeModule: de,
-  SelectRowModule: Be,
-  SortModule: Ve,
+  SelectRowModule: _e,
+  SortModule: Be,
   SpreadsheetModule: Et,
   TooltipModule: Rt,
-  ValidateModule: Ie
+  ValidateModule: Ve
 }), As = {
   debugEventsExternal: !1,
   //flag to console log events
@@ -10482,19 +10482,19 @@ function Zs(l, e) {
   }
   function f(p, g, b, m) {
     var C = [], T = 0, k = 0, x = 0, z = n, X = 0, S = 0, pe = [];
-    function Je(y) {
+    function Xe(y) {
       return b * (y.column.definition.widthGrow || 1);
     }
-    function $e(y) {
+    function Je(y) {
       return c(y.width) - b * (y.column.definition.widthShrink || 0);
     }
     return p.forEach(function(y, gn) {
-      var Ke = m ? $e(y) : Je(y);
-      y.column.minWidth >= Ke ? C.push(y) : y.column.maxWidth && y.column.maxWidth < Ke ? (y.width = y.column.maxWidth, g -= y.column.maxWidth, z -= m ? y.column.definition.widthShrink || 1 : y.column.definition.widthGrow || 1, z && (b = Math.floor(g / z))) : (pe.push(y), S += m ? y.column.definition.widthShrink || 1 : y.column.definition.widthGrow || 1);
+      var $e = m ? Je(y) : Xe(y);
+      y.column.minWidth >= $e ? C.push(y) : y.column.maxWidth && y.column.maxWidth < $e ? (y.width = y.column.maxWidth, g -= y.column.maxWidth, z -= m ? y.column.definition.widthShrink || 1 : y.column.definition.widthGrow || 1, z && (b = Math.floor(g / z))) : (pe.push(y), S += m ? y.column.definition.widthShrink || 1 : y.column.definition.widthGrow || 1);
     }), C.length ? (C.forEach(function(y) {
       T += m ? y.width - y.column.minWidth : y.column.minWidth, y.width = y.column.minWidth;
     }), k = g - T, x = S ? Math.floor(k / S) : k, X = f(pe, k, x, m)) : (X = S ? g - Math.floor(g / S) * S : g, pe.forEach(function(y) {
-      y.width = m ? $e(y) : Je(y);
+      y.width = m ? Je(y) : Xe(y);
     })), X;
   }
   this.table.options.responsiveLayout && this.table.modExists("responsiveLayout", !0) && this.table.modules.responsiveLayout.update(), this.table.rowManager.element.scrollHeight > this.table.rowManager.element.clientHeight && (t -= this.table.rowManager.element.offsetWidth - this.table.rowManager.element.clientWidth), l.forEach(function(p) {
@@ -10544,7 +10544,7 @@ const Z = class Z extends w {
 };
 v(Z, "moduleName", "layout"), //load defaults
 v(Z, "modes", en);
-let Ne = Z;
+let Ie = Z;
 var tn = {
   default: {
     //hold default locale text
@@ -10652,7 +10652,7 @@ const ae = class ae extends w {
 };
 v(ae, "moduleName", "localize"), //load defaults
 v(ae, "langs", tn);
-let We = ae;
+let Ne = ae;
 class Tt extends w {
   constructor(e) {
     super(e);
@@ -10682,8 +10682,8 @@ v(Tt, "moduleName", "comms");
 var sn = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   CommsModule: Tt,
-  LayoutModule: Ne,
-  LocalizeModule: We
+  LayoutModule: Ie,
+  LocalizeModule: Ne
 });
 const F = class F {
   static findTable(e) {
@@ -10717,8 +10717,8 @@ v(F, "registry", {
     });
   }
 });
-let Ge = F;
-const E = class E extends Ge {
+let We = F;
+const E = class E extends We {
   constructor() {
     super();
   }
@@ -10787,7 +10787,7 @@ const E = class E extends Ge {
   }
 };
 v(E, "moduleBindings", {}), v(E, "moduleExtensions", {}), v(E, "modulesRegistered", !1), v(E, "defaultModules", !1);
-let je = E;
+let Ge = E;
 class nn extends M {
   constructor(e) {
     super(e), this.element = this._createAlertElement(), this.msgElement = this._createMsgElement(), this.type = null, this.element.appendChild(this.msgElement);
@@ -10813,7 +10813,7 @@ class nn extends M {
     this.dispatch("alert-hide", this.type), this.element.parentNode && this.element.parentNode.removeChild(this.element), this.msgElement.classList.remove(this._typeClass());
   }
 }
-const O = class O extends je {
+const O = class O extends Ge {
   static extendModule() {
     O.initializeModuleBinder(), O._extendModule(...arguments);
   }
@@ -11122,17 +11122,17 @@ const O = class O extends je {
 };
 //default setup options
 v(O, "defaultOptions", As);
-let Ue = O;
-var ie = Ue;
+let je = O;
+var ie = je;
 class rn extends ie {
   static extendModule() {
-    ie.initializeModuleBinder(be), ie._extendModule(...arguments);
+    ie.initializeModuleBinder(ge), ie._extendModule(...arguments);
   }
   static registerModule() {
-    ie.initializeModuleBinder(be), ie._registerModule(...arguments);
+    ie.initializeModuleBinder(ge), ie._registerModule(...arguments);
   }
   constructor(e, t, i) {
-    super(e, t, be);
+    super(e, t, ge);
   }
 }
 var on = rn;
@@ -11168,14 +11168,14 @@ function an(l) {
       console.error("❌ Error creating Tabulator:", r);
     }
   }
-  return qe([() => l.isSuccess.value, e], async ([r, o]) => {
+  return Ke([() => l.isSuccess.value, e], async ([r, o]) => {
     var a;
-    console.log("👀 Watch triggered - isSuccess:", r, "divRef:", !!o, "isTableInitialized:", s.value), r && o && !s.value && (await ve(), console.log("🎯 Conditions met, initializing table with", (a = l.data.value) == null ? void 0 : a.length, "rows"), n(), s.value = !0);
-  }, { immediate: !0 }), qe(() => l.data.value, async (r) => {
+    console.log("👀 Watch triggered - isSuccess:", r, "divRef:", !!o, "isTableInitialized:", s.value), r && o && !s.value && (await be(), console.log("🎯 Conditions met, initializing table with", (a = l.data.value) == null ? void 0 : a.length, "rows"), n(), s.value = !0);
+  }, { immediate: !0 }), Ke(() => l.data.value, async (r) => {
     if (!(!t || !r)) {
       console.log("🔄 Data changed, updating table with", r.length, "rows");
       try {
-        await ve(), t.replaceData(r);
+        await be(), t.replaceData(r);
       } catch (o) {
         console.warn("Error updating table data:", o), n();
       }
@@ -11335,7 +11335,7 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
         isSuccess: t.isSuccess.value,
         isError: t.isError.value,
         dataLength: (h = t.data.value) == null ? void 0 : h.length
-      }), t.isSuccess.value && r.value && !a.value && ve(() => {
+      }), t.isSuccess.value && r.value && !a.value && be(() => {
         console.log("🚀 Initializing on mount"), o(), a.value = !0;
       });
     }), tt(() => {
@@ -11344,22 +11344,22 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
       var u;
       return te(), ee("div", ln, [
         J("div", hn, [
-          J("h2", null, "Call Positions - " + me(l.symbolRoot), 1),
-          $(t).isSuccess.value ? (te(), ee("div", dn, " Found " + me(((u = $(t).data.value) == null ? void 0 : u.length) || 0) + " position(s) ", 1)) : Ye("", !0)
+          d[0] || (d[0] = J("h2", null, "Call Positions", -1)),
+          $(t).isSuccess.value ? (te(), ee("div", dn, " Found " + Ye(((u = $(t).data.value) == null ? void 0 : u.length) || 0) + " position(s) ", 1)) : qe("", !0)
         ]),
-        $(t).isLoading.value ? (te(), ee("div", un, [...d[0] || (d[0] = [
+        $(t).isLoading.value ? (te(), ee("div", un, [...d[1] || (d[1] = [
           J("div", { class: "loading-spinner" }, null, -1),
           zt(" Loading call positions... ", -1)
         ])])) : $(t).isError.value ? (te(), ee("div", cn, [
-          d[1] || (d[1] = J("h3", null, "Error loading positions", -1)),
-          J("p", null, me($(t).error.value), 1)
+          d[2] || (d[2] = J("h3", null, "Error loading positions", -1)),
+          J("p", null, Ye($(t).error.value), 1)
         ])) : $(t).isSuccess.value ? (te(), ee("div", fn, [
           J("div", {
             ref_key: "tableDiv",
             ref: r,
             class: "tabulator-table"
           }, null, 512)
-        ])) : Ye("", !0)
+        ])) : qe("", !0)
       ]);
     };
   }
@@ -11368,7 +11368,7 @@ const ln = { class: "call-positions-for-single-instrument-view" }, hn = { class:
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-c6a43a08"]]);
+}, yn = /* @__PURE__ */ mn(pn, [["__scopeId", "data-v-1ace0462"]]);
 export {
   yn as callPositions,
   yn as default

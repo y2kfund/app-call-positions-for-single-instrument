@@ -187,7 +187,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="call-positions-for-single-instrument-view">
     <div class="positions-header">
-      <h2>Call Positions - {{ symbolRoot }}</h2>
+      <h2>Call Positions</h2>
       <div v-if="q.isSuccess.value" class="positions-info">
         Found {{ q.data.value?.length || 0 }} position(s)
       </div>
