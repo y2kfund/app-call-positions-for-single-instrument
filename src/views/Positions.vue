@@ -283,6 +283,22 @@ const columns: ColumnDefinition[] = [
         return tags[1] || '<span style="color:#aaa;font-style:italic;">Unknown</span>'
       }
       return '<span style="color:#aaa;font-style:italic;">Not applicable</span>'
+    },
+    sorter: (a: any, b: any, aRow: any, bRow: any) => {
+      const aData = aRow.getData()
+      const bData = bRow.getData()
+      
+      // Extract dates from symbols
+      const aDateStr = extractTagsFromSymbol(aData.symbol)[1] || ''
+      const bDateStr = extractTagsFromSymbol(bData.symbol)[1] || ''
+      
+      // Handle empty/unknown dates
+      if (!aDateStr && !bDateStr) return 0
+      if (!aDateStr) return 1
+      if (!bDateStr) return -1
+      
+      // Compare as date strings (YYYY-MM-DD format sorts correctly as strings)
+      return aDateStr.localeCompare(bDateStr)
     }
   },
   { 
@@ -606,6 +622,22 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
                       return tags[1] || '<span style="color:#aaa;font-style:italic;">Unknown</span>'
                     }
                     return '<span style="color:#aaa;font-style:italic;">Not applicable</span>'
+                  },
+                  sorter: (a: any, b: any, aRow: any, bRow: any) => {
+                    const aData = aRow.getData()
+                    const bData = bRow.getData()
+                    
+                    // Extract dates from symbols
+                    const aDateStr = extractTagsFromSymbol(aData.symbol)[1] || ''
+                    const bDateStr = extractTagsFromSymbol(bData.symbol)[1] || ''
+                    
+                    // Handle empty/unknown dates
+                    if (!aDateStr && !bDateStr) return 0
+                    if (!aDateStr) return 1
+                    if (!bDateStr) return -1
+                    
+                    // Compare as date strings (YYYY-MM-DD format sorts correctly as strings)
+                    return aDateStr.localeCompare(bDateStr)
                   }
                 },
                 { 
@@ -857,6 +889,22 @@ const {
                       return tags[1] || '<span style="color:#aaa;font-style:italic;">Unknown</span>'
                     }
                     return '<span style="color:#aaa;font-style:italic;">Not applicable</span>'
+                  },
+                  sorter: (a: any, b: any, aRow: any, bRow: any) => {
+                    const aData = aRow.getData()
+                    const bData = bRow.getData()
+                    
+                    // Extract dates from symbols
+                    const aDateStr = extractTagsFromSymbol(aData.symbol)[1] || ''
+                    const bDateStr = extractTagsFromSymbol(bData.symbol)[1] || ''
+                    
+                    // Handle empty/unknown dates
+                    if (!aDateStr && !bDateStr) return 0
+                    if (!aDateStr) return 1
+                    if (!bDateStr) return -1
+                    
+                    // Compare as date strings (YYYY-MM-DD format sorts correctly as strings)
+                    return aDateStr.localeCompare(bDateStr)
                   }
                 },
                 { 

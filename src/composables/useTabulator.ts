@@ -38,6 +38,9 @@ export function useTabulator(options: UseTabulatorOptions) {
       placeholder,
       height: '100%',
       reactiveData: true,
+      initialSort: [
+        { column: 'expiry_date', dir: 'desc' }
+      ]
     }
 
     if (rowFormatter) {
