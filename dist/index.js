@@ -11158,7 +11158,7 @@ function Ft(l) {
       height: "100%",
       reactiveData: !0,
       initialSort: [
-        { column: "expiry_date", dir: "desc" }
+        { column: "expiry_date", dir: "asc" }
       ]
     };
     n && (d.rowFormatter = n), a.value = new Me(o.value, d), r.value = !0, console.log("✅ Tabulator initialized");

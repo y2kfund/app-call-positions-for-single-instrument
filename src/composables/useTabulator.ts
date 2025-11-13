@@ -39,7 +39,7 @@ export function useTabulator(options: UseTabulatorOptions) {
       height: '100%',
       reactiveData: true,
       initialSort: [
-        { column: 'expiry_date', dir: 'desc' }
+        { column: 'expiry_date', dir: 'asc' }
       ]
     }
 
