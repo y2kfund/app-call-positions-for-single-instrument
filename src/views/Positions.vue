@@ -190,6 +190,21 @@ function getRowPositionKey(data: any): string {
   return getPositionKey(data)
 }
 
+// Helper function to get border color based on delta value
+function getDeltaBorderColor(delta: number | null): string {
+  if (delta === null || delta === undefined) return 'transparent'
+  
+  const absDelta = Math.abs(delta) // Use absolute value
+  
+  if (absDelta >= 0.4) { // >= 40%
+    return '#dc3545' // Red
+  } else if (absDelta <= 0.2) { // <= 20%
+    return '#28a745' // Green
+  } else { // Between 20% - 40%
+    return '#fd7e14' // Light orange
+  }
+}
+
 // Define columns with expansion support
 const columns: ColumnDefinition[] = [
   {
@@ -449,6 +464,14 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
       
       if (!data) return
 
+      // 🎨 Apply delta-based border color styling
+      const delta = data.delta
+      const borderColor = getDeltaBorderColor(delta)
+      const firstCell = element.querySelector('.tabulator-cell:first-child') as HTMLElement
+      if (firstCell) {
+        firstCell.style.borderLeft = `10px solid ${borderColor}`
+      }
+
       const posKey = getRowPositionKey(data)
       const attachedTradeIds = positionTradesMap.value.get(posKey)
       const attachedPositionKeys = positionPositionsMap.value.get(posKey)
@@ -456,6 +479,8 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
       
       console.log('🎨 Row formatter running for:', posKey, {
         isExpanded,
+        delta,
+        borderColor,
         attachedTradeIds: attachedTradeIds?.size || 0,
         attachedPositionKeys: attachedPositionKeys?.size || 0,
         processing: processingPositions.value.has(posKey)
@@ -804,6 +829,14 @@ const {
       const element = row.getElement()
       
       if (!data) return
+
+      // 🎨 Apply delta-based border color styling
+      const delta = data.delta
+      const borderColor = getDeltaBorderColor(delta)
+      const firstCell = element.querySelector('.tabulator-cell:first-child') as HTMLElement
+      if (firstCell) {
+        firstCell.style.borderLeft = `10px solid ${borderColor}`
+      }
 
       const posKey = getRowPositionKey(data)
       const attachedTradeIds = positionTradesMap.value.get(posKey)
