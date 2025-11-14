@@ -11595,6 +11595,17 @@ const yo = { class: "call-positions-for-single-instrument-view" }, Eo = { class:
           const p = b.getValue();
           return p != null ? "$" + Number(p).toFixed(2) : "";
         }
+      },
+      {
+        title: "Delta",
+        field: "delta",
+        hozAlign: "right",
+        headerHozAlign: "right",
+        widthGrow: 0.8,
+        formatter: (b) => {
+          const p = b.getValue();
+          return p == null ? '<span style="color:#aaa;font-style:italic;">N/A</span>' : `<span style="color:${p < 0 ? "#dc3545" : p > 0 ? "#28a745" : "#000"}">${Number(p).toFixed(3)}</span>`;
+        }
       }
     ], { tableDiv: A, initializeTabulator: Wt, isTableInitialized: He, tabulator: ne } = ei({
       data: s.data,
@@ -11825,6 +11836,17 @@ const yo = { class: "call-positions-for-single-instrument-view" }, Eo = { class:
                         const y = R.getValue();
                         return y != null ? "$" + Number(y).toFixed(2) : "";
                       }
+                    },
+                    {
+                      title: "Delta",
+                      field: "delta",
+                      hozAlign: "right",
+                      headerHozAlign: "right",
+                      widthGrow: 0.8,
+                      formatter: (R) => {
+                        const y = R.getValue();
+                        return y == null ? '<span style="color:#aaa;font-style:italic;">N/A</span>' : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">${Number(y).toFixed(3)}</span>`;
+                      }
                     }
                   ]
                 });
@@ -12012,6 +12034,17 @@ const yo = { class: "call-positions-for-single-instrument-view" }, Eo = { class:
                       formatter: (R) => {
                         const y = R.getValue();
                         return y != null ? "$" + Number(y).toFixed(2) : "";
+                      }
+                    },
+                    {
+                      title: "Delta",
+                      field: "delta",
+                      hozAlign: "right",
+                      headerHozAlign: "right",
+                      widthGrow: 0.8,
+                      formatter: (R) => {
+                        const y = R.getValue();
+                        return y == null ? '<span style="color:#aaa;font-style:italic;">N/A</span>' : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">${Number(y).toFixed(3)}</span>`;
                       }
                     }
                   ]
@@ -12356,7 +12389,7 @@ const yo = { class: "call-positions-for-single-instrument-view" }, Eo = { class:
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, Er = /* @__PURE__ */ gr(mr, [["__scopeId", "data-v-610848bb"]]);
+}, Er = /* @__PURE__ */ gr(mr, [["__scopeId", "data-v-e879c4e0"]]);
 export {
   Er as callPositions,
   Er as default

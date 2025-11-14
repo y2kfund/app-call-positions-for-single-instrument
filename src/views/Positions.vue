@@ -2,7 +2,7 @@
 import { computed, onMounted, onBeforeUnmount, nextTick, ref, watch } from 'vue'
 import type { ColumnDefinition } from 'tabulator-tables'
 import { useCallPositionsQuery } from '@y2kfund/core/callPositionsForSingleInstrument'
-import { useSupabase, fetchPositionsBySymbolRoot, savePositionTradeMappings, savePositionPositionMappings } from '@y2kfund/core'
+import { useSupabase, fetchPositionsBySymbolRoot, savePositionTradeMappings, savePositionPositionMappings, type Position } from '@y2kfund/core'
 import { useTabulator } from '../composables/useTabulator'
 import { useAttachedData } from '../composables/useAttachedData'
 import { usePositionExpansion } from '../composables/usePositionExpansion'
@@ -420,6 +420,19 @@ const columns: ColumnDefinition[] = [
       const value = cell.getValue()
       return value != null ? '$' + Number(value).toFixed(2) : ''
     }
+  },
+  { 
+    title: 'Delta', 
+    field: 'delta', 
+    hozAlign: 'right', 
+    headerHozAlign: 'right',
+    widthGrow: 0.8,
+    formatter: (cell: any) => {
+      const value = cell.getValue()
+      if (value == null) return '<span style="color:#aaa;font-style:italic;">N/A</span>'
+      const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
+      return `<span style="color:${color}">${Number(value).toFixed(3)}</span>`
+    }
   }
 ]
 
@@ -734,6 +747,19 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
                     const value = cell.getValue()
                     return value != null ? '$' + Number(value).toFixed(2) : ''
                   }
+                },
+                { 
+                  title: 'Delta', 
+                  field: 'delta', 
+                  hozAlign: 'right', 
+                  headerHozAlign: 'right',
+                  widthGrow: 0.8,
+                  formatter: (cell: any) => {
+                    const value = cell.getValue()
+                    if (value == null) return '<span style="color:#aaa;font-style:italic;">N/A</span>'
+                    const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
+                    return `<span style="color:${color}">${Number(value).toFixed(3)}</span>`
+                  }
                 }
               ]
             })
@@ -1006,6 +1032,19 @@ const {
                   formatter: (cell: any) => {
                     const value = cell.getValue()
                     return value != null ? '$' + Number(value).toFixed(2) : ''
+                  }
+                },
+                { 
+                  title: 'Delta', 
+                  field: 'delta', 
+                  hozAlign: 'right', 
+                  headerHozAlign: 'right',
+                  widthGrow: 0.8,
+                  formatter: (cell: any) => {
+                    const value = cell.getValue()
+                    if (value == null) return '<span style="color:#aaa;font-style:italic;">N/A</span>'
+                    const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
+                    return `<span style="color:${color}">${Number(value).toFixed(3)}</span>`
                   }
                 }
               ]
