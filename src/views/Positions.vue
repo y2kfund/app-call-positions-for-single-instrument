@@ -205,6 +205,22 @@ function getDeltaBorderColor(delta: number | null): string {
   }
 }
 
+function calculateDTE(symbolText: string): number | null {
+  const tags = extractTagsFromSymbol(symbolText)
+  const expiryDateStr = tags[1] // YYYY-MM-DD format
+  if (!expiryDateStr) return null
+  
+  const expiryDate = new Date(expiryDateStr)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  expiryDate.setHours(0, 0, 0, 0)
+  
+  const diffTime = expiryDate.getTime() - today.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  
+  return diffDays
+}
+
 // Define columns with expansion support
 const columns: ColumnDefinition[] = [
   {
@@ -334,6 +350,43 @@ const columns: ColumnDefinition[] = [
       
       // Compare as date strings (YYYY-MM-DD format sorts correctly as strings)
       return aDateStr.localeCompare(bDateStr)
+    }
+  },
+  { 
+    title: 'DTE', 
+    field: 'dte', 
+    hozAlign: 'right', 
+    headerHozAlign: 'right',
+    widthGrow: 0.6,
+    formatter: (cell: any) => {
+      const row = cell.getRow().getData()
+      if (row.asset_class === 'OPT') {
+        const dte = calculateDTE(row.symbol)
+        if (dte === null) return '<span style="color:#aaa;font-style:italic;">N/A</span>'
+        
+        // Color code based on DTE
+        let color = '#000'
+        if (dte < 0) color = '#dc3545' // Red for expired
+        else if (dte <= 7) color = '#fd7e14' // Orange for <= 7 days
+        else if (dte <= 30) color = '#ffc107' // Yellow for <= 30 days
+        else color = '#28a745' // Green for > 30 days
+        
+        return `<span style="color:${color};font-weight:${dte <= 7 ? 'bold' : 'normal'}">${dte}</span>`
+      }
+      return '<span style="color:#aaa;font-style:italic;">N/A</span>'
+    },
+    sorter: (a: any, b: any, aRow: any, bRow: any) => {
+      const aData = aRow.getData()
+      const bData = bRow.getData()
+      
+      const aDTE = calculateDTE(aData.symbol)
+      const bDTE = calculateDTE(bData.symbol)
+      
+      if (aDTE === null && bDTE === null) return 0
+      if (aDTE === null) return 1
+      if (bDTE === null) return -1
+      
+      return aDTE - bDTE
     }
   },
   { 
