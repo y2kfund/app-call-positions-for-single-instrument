@@ -11499,7 +11499,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
         field: "strike_price",
         hozAlign: "left",
         headerHozAlign: "left",
-        widthGrow: 0.6,
+        widthGrow: 0.8,
         formatter: (g) => {
           const f = g.getRow().getData();
           return f.asset_class === "OPT" ? M(f.symbol)[2] || '<span style="color:#aaa;font-style:italic;">Unknown</span>' : '<span style="color:#aaa;font-style:italic;">Not applicable</span>';
@@ -11525,7 +11525,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
         field: "dte",
         hozAlign: "right",
         headerHozAlign: "right",
-        widthGrow: 0.6,
+        widthGrow: 0.8,
         formatter: (g) => {
           const f = g.getRow().getData();
           if (f.asset_class === "OPT") {
@@ -11576,7 +11576,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
         field: "market_value",
         hozAlign: "right",
         headerHozAlign: "right",
-        widthGrow: 1.5,
+        widthGrow: 1.2,
         formatter: (g) => {
           const f = g.getValue();
           return f == null ? "" : `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
@@ -12429,7 +12429,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, Mr = /* @__PURE__ */ yr(Cr, [["__scopeId", "data-v-1e597f37"]]);
+}, Mr = /* @__PURE__ */ yr(Cr, [["__scopeId", "data-v-a4bca90f"]]);
 export {
   Mr as callPositions,
   Mr as default

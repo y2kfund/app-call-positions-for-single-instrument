@@ -311,7 +311,7 @@ const columns: ColumnDefinition[] = [
     field: 'strike_price', 
     hozAlign: 'left', 
     headerHozAlign: 'left',
-    widthGrow: 0.6,
+    widthGrow: 0.8,
     formatter: (cell: any) => {
       const row = cell.getRow().getData()
       if (row.asset_class === 'OPT') {
@@ -357,7 +357,7 @@ const columns: ColumnDefinition[] = [
     field: 'dte', 
     hozAlign: 'right', 
     headerHozAlign: 'right',
-    widthGrow: 0.6,
+    widthGrow: 0.8,
     formatter: (cell: any) => {
       const row = cell.getRow().getData()
       if (row.asset_class === 'OPT') {
@@ -426,7 +426,7 @@ const columns: ColumnDefinition[] = [
     field: 'market_value', 
     hozAlign: 'right', 
     headerHozAlign: 'right',
-    widthGrow: 1.5,
+    widthGrow: 1.2,
     formatter: (cell: any) => {
       const value = cell.getValue()
       if (value == null) return ''
