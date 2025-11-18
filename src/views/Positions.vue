@@ -431,13 +431,13 @@ const columns: ColumnDefinition[] = [
       const value = cell.getValue()
       if (value == null) return ''
       const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
     },
     bottomCalc: 'sum',
     bottomCalcFormatter: (cell: any) => {
       const value = cell.getValue()
       const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
     }
   },
   { 
@@ -450,13 +450,13 @@ const columns: ColumnDefinition[] = [
       const value = cell.getValue()
       if (value == null) return ''
       const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
     },
     bottomCalc: 'sum',
     bottomCalcFormatter: (cell: any) => {
       const value = cell.getValue()
       const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
     }
   },
   { 
@@ -469,13 +469,13 @@ const columns: ColumnDefinition[] = [
       const value = cell.getValue()
       if (value == null) return ''
       const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
     },
     bottomCalc: 'sum',
     bottomCalcFormatter: (cell: any) => {
       const value = cell.getValue()
       const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+      return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
     }
   },
   { 
@@ -786,7 +786,7 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
                     const value = cell.getValue()
                     if (value == null) return ''
                     const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
                   }
                 },
                 { 
@@ -799,7 +799,7 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
                     const value = cell.getValue()
                     if (value == null) return ''
                     const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
                   }
                 },
                 { 
@@ -812,7 +812,7 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
                     const value = cell.getValue()
                     if (value == null) return ''
                     const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
                   }
                 },
                 { 
@@ -1074,7 +1074,7 @@ const {
                     const value = cell.getValue()
                     if (value == null) return ''
                     const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
                   }
                 },
                 { 
@@ -1087,7 +1087,7 @@ const {
                     const value = cell.getValue()
                     if (value == null) return ''
                     const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
                   }
                 },
                 { 
@@ -1100,13 +1100,13 @@ const {
                     const value = cell.getValue()
                     if (value == null) return ''
                     const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
                   },
                   bottomCalc: 'sum',
                   bottomCalcFormatter: (cell: any) => {
                     const value = cell.getValue()
                     const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
-                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`
+                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
                   }
                 },
                 { 

@@ -11579,12 +11579,12 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
         widthGrow: 1.2,
         formatter: (g) => {
           const f = g.getValue();
-          return f == null ? "" : `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+          return f == null ? "" : `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
         },
         bottomCalc: "sum",
         bottomCalcFormatter: (g) => {
           const f = g.getValue();
-          return `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+          return `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
         }
       },
       {
@@ -11595,12 +11595,12 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
         widthGrow: 1.5,
         formatter: (g) => {
           const f = g.getValue();
-          return f == null ? "" : `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+          return f == null ? "" : `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
         },
         bottomCalc: "sum",
         bottomCalcFormatter: (g) => {
           const f = g.getValue();
-          return `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+          return `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
         }
       },
       {
@@ -11611,12 +11611,12 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
         widthGrow: 1.5,
         formatter: (g) => {
           const f = g.getValue();
-          return f == null ? "" : `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+          return f == null ? "" : `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
         },
         bottomCalc: "sum",
         bottomCalcFormatter: (g) => {
           const f = g.getValue();
-          return `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+          return `<span style="color:${f < 0 ? "#dc3545" : f > 0 ? "#28a745" : "#000"}">$${Number(f).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
         }
       },
       {
@@ -11839,7 +11839,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
                       widthGrow: 1.5,
                       formatter: (x) => {
                         const y = x.getValue();
-                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
                       }
                     },
                     {
@@ -11850,7 +11850,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
                       widthGrow: 1.5,
                       formatter: (x) => {
                         const y = x.getValue();
-                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
                       }
                     },
                     {
@@ -11861,7 +11861,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
                       widthGrow: 1.5,
                       formatter: (x) => {
                         const y = x.getValue();
-                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
                       }
                     },
                     {
@@ -12035,7 +12035,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
                       widthGrow: 1.5,
                       formatter: (x) => {
                         const y = x.getValue();
-                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
                       }
                     },
                     {
@@ -12046,7 +12046,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
                       widthGrow: 1.5,
                       formatter: (x) => {
                         const y = x.getValue();
-                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
                       }
                     },
                     {
@@ -12057,12 +12057,12 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
                       widthGrow: 1,
                       formatter: (x) => {
                         const y = x.getValue();
-                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                        return y == null ? "" : `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
                       },
                       bottomCalc: "sum",
                       bottomCalcFormatter: (x) => {
                         const y = x.getValue();
-                        return `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                        return `<span style="color:${y < 0 ? "#dc3545" : y > 0 ? "#28a745" : "#000"}">$${Number(y).toLocaleString(void 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>`;
                       }
                     },
                     {
@@ -12429,7 +12429,7 @@ const ko = { class: "call-positions-for-single-instrument-view" }, Mo = { class:
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, Mr = /* @__PURE__ */ yr(Cr, [["__scopeId", "data-v-a4bca90f"]]);
+}, Mr = /* @__PURE__ */ yr(Cr, [["__scopeId", "data-v-c450c185"]]);
 export {
   Mr as callPositions,
   Mr as default
