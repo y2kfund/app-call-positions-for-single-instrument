@@ -1391,6 +1391,24 @@ function isPositionExpired(position: Position): boolean {
   return expiryDate < today
 }
 
+function formatDateWithTimePST(dateStr: string): string {
+  if (!dateStr) return ''
+  
+  const date = new Date(dateStr)
+  
+  // Format with PST timezone
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZone: 'America/Los_Angeles',
+    timeZoneName: 'short'
+  }).format(date)
+}
+
 // close/open body scroll lock for modal
 watch(showAttachModal, (val) => {
   try {
@@ -1587,9 +1605,11 @@ watch(showAttachModal, (val) => {
                   </div>
                   <div class="trade-secondary">
                     <span>{{ p.asset_class }}</span>
-                    <span>•</span>
+                    <span> • </span>
                     <span>{{ p.internal_account_id || p.legal_entity }}</span>
-                    <span v-if="p.market_value">• MV: ${{ formatCurrency(p.market_value) }}</span>
+                    <span v-if="p.market_value">• MV: {{ formatCurrency(p.market_value) }}</span>
+                    <span> • </span>
+                    <span>Fetched at: {{ formatDateWithTimePST(p.fetched_at) }}</span>
                   </div>
                 </div>
               </div>
