@@ -486,7 +486,26 @@ const columns: ColumnDefinition[] = [
     widthGrow: 1,
     formatter: (cell: any) => {
       const value = cell.getValue()
-      return value != null ? '$' + Number(value).toFixed(2) : ''
+      if (value === null || value === undefined) return '-'
+      
+      const row = cell.getRow().getData()
+      const symbol = row.symbol
+      const qty = row.accounting_quantity
+      
+      // Add directional symbol based on option type and position (sold options only)
+      let prefix = ''
+      if (symbol && qty < 0) { // Only for sold options (negative qty)
+        const tags = extractTagsFromSymbol(symbol)
+        const right = tags[3] // Fourth tag is the right (P or C)
+        
+        if (right === 'P') {
+          prefix = '> ' // PUT sold - stock must stay above BE price for profit
+        } else if (right === 'C') {
+          prefix = '< ' // CALL sold - stock must stay below BE price for profit
+        }
+      }
+      
+      return prefix + '$' + Number(value).toFixed(2)
     }
   },
   { 
@@ -823,7 +842,26 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
                   widthGrow: 1,
                   formatter: (cell: any) => {
                     const value = cell.getValue()
-                    return value != null ? '$' + Number(value).toFixed(2) : ''
+                    if (value === null || value === undefined) return '-'
+                    
+                    const row = cell.getRow().getData()
+                    const symbol = row.symbol
+                    const qty = row.accounting_quantity
+                    
+                    // Add directional symbol based on option type and position (sold options only)
+                    let prefix = ''
+                    if (symbol && qty < 0) { // Only for sold options (negative qty)
+                      const tags = extractTagsFromSymbol(symbol)
+                      const right = tags[3] // Fourth tag is the right (P or C)
+                      
+                      if (right === 'P') {
+                        prefix = '> ' // PUT sold - stock must stay above BE price for profit
+                      } else if (right === 'C') {
+                        prefix = '< ' // CALL sold - stock must stay below BE price for profit
+                      }
+                    }
+                    
+                    return prefix + '$' + Number(value).toFixed(2)
                   }
                 },
                 { 
@@ -1117,7 +1155,26 @@ const {
                   widthGrow: 1,
                   formatter: (cell: any) => {
                     const value = cell.getValue()
-                    return value != null ? '$' + Number(value).toFixed(2) : ''
+                    if (value === null || value === undefined) return '-'
+                    
+                    const row = cell.getRow().getData()
+                    const symbol = row.symbol
+                    const qty = row.accounting_quantity
+                    
+                    // Add directional symbol based on option type and position (sold options only)
+                    let prefix = ''
+                    if (symbol && qty < 0) { // Only for sold options (negative qty)
+                      const tags = extractTagsFromSymbol(symbol)
+                      const right = tags[3] // Fourth tag is the right (P or C)
+                      
+                      if (right === 'P') {
+                        prefix = '> ' // PUT sold - stock must stay above BE price for profit
+                      } else if (right === 'C') {
+                        prefix = '< ' // CALL sold - stock must stay below BE price for profit
+                      }
+                    }
+                    
+                    return prefix + '$' + Number(value).toFixed(2)
                   }
                 },
                 { 
