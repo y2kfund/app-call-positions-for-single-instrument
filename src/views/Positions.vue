@@ -14,7 +14,7 @@ interface callPositionsProps {
 }
 
 const props = withDefaults(defineProps<callPositionsProps>(), {
-  symbolRoot: 'META',
+  symbolRoot: 'IBIT',
   userId: '67e578fd-2cf7-48a4-b028-a11a3f89bb9b'
 })
 
@@ -54,6 +54,12 @@ const expiredPositions = ref<any[]>([])
 const loadingExpired = ref(false)
 const errorExpired = ref<string | null>(null)
 const expiredDataLoaded = ref(false)
+
+// Context menu state
+const showContextMenu = ref(false)
+const contextMenuX = ref(0)
+const contextMenuY = ref(0)
+const contextMenuContent = ref('')
 
 // Helper functions
 function extractTagsFromSymbol(symbolText: string): string[] {
@@ -525,6 +531,79 @@ const columns: ColumnDefinition[] = [
       if (value == null) return '<span style="color:#aaa;font-style:italic;">N/A</span>'
       const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
       return `<span style="color:${color}">${Number(value).toFixed(3)}</span>`
+    }
+  },
+  { 
+    title: 'Rent per day<br>per share', 
+    field: 'rent_per_day_per_share', 
+    hozAlign: 'right', 
+    headerHozAlign: 'right',
+    widthGrow: 1.2,
+    formatter: (cell: any) => {
+      const row = cell.getRow().getData()
+      const entryCashFlow = row.computed_cash_flow_on_entry
+      const quantity = row.accounting_quantity
+      const dte = calculateDTE(row.symbol)
+      
+      if (entryCashFlow == null || quantity == null || dte == null || dte === 0 || quantity === 0) {
+        return '<span style="color:#aaa;font-style:italic;">N/A</span>'
+      }
+      
+      // Premium per share = Entry Cash Flow / abs(Quantity)
+      const premiumPerShare = entryCashFlow / Math.abs(quantity)
+      
+      // Rent per day per share = Premium per share / DTE
+      const rentPerDayPerShare = premiumPerShare / dte
+      
+      const color = rentPerDayPerShare < 0 ? '#dc3545' : rentPerDayPerShare > 0 ? '#28a745' : '#000'
+      return `<span style="color:${color};cursor:context-menu;">$${Number(rentPerDayPerShare).toFixed(2)}</span>`
+    },
+    cellContext: (e: any, cell: any) => {
+      e.preventDefault()
+      
+      const row = cell.getRow().getData()
+      const entryCashFlow = row.computed_cash_flow_on_entry
+      const quantity = row.accounting_quantity
+      const dte = calculateDTE(row.symbol)
+      
+      if (entryCashFlow == null || quantity == null || dte == null || dte === 0 || quantity === 0) {
+        return
+      }
+      
+      const premiumPerShare = entryCashFlow / Math.abs(quantity)
+      const rentPerDayPerShare = premiumPerShare / dte
+      
+      // Set context menu position - position to the left of cursor
+      // Approximate menu width is 280px, so offset by that amount to show on left
+      const menuWidth = 280
+      contextMenuX.value = Math.max(10, e.clientX - menuWidth)
+      
+      // Adjust vertical position if too close to bottom
+      const menuHeight = 200 // approximate height
+      const windowHeight = window.innerHeight
+      if (e.clientY + menuHeight > windowHeight) {
+        contextMenuY.value = Math.max(10, windowHeight - menuHeight - 10)
+      } else {
+        contextMenuY.value = e.clientY
+      }
+      
+      contextMenuContent.value = `<div style="padding: 12px;">
+        <div style="font-weight: bold; margin-bottom: 10px; font-size: 14px;">📊 Rent per Day Calculation</div>
+        <div style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+          <div><strong>Entry Cash Flow:</strong> $${Number(entryCashFlow).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+          <div><strong>Quantity:</strong> ${Math.abs(quantity).toLocaleString()}</div>
+          <div><strong>DTE:</strong> ${dte} days</div>
+        </div>
+        <div style="margin-bottom: 6px;">
+          <strong>Step 1:</strong> Premium per share<br>
+          <span style="font-family: monospace;">$${Number(entryCashFlow).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ÷ ${Math.abs(quantity).toLocaleString()} = <strong>$${Number(premiumPerShare).toFixed(2)}</strong></span>
+        </div>
+        <div>
+          <strong>Step 2:</strong> Rent per day per share<br>
+          <span style="font-family: monospace;">$${Number(premiumPerShare).toFixed(2)} ÷ ${dte} days = <strong style="color: #28a745;">$${Number(rentPerDayPerShare).toFixed(2)}</strong></span>
+        </div>
+      </div>`
+      showContextMenu.value = true
     }
   }
 ]
@@ -1402,6 +1481,11 @@ onMounted(async () => {
   
   // Don't set isTableInitialized manually, let the composable handle it
   // The useTabulator composable will initialize when data is ready
+  
+  // Add click listener to close context menu
+  document.addEventListener('click', () => {
+    showContextMenu.value = false
+  })
 })
 
 // Watch for when mappings become ready and redraw the table
@@ -1421,6 +1505,11 @@ watch(isReady, async (ready) => {
 
 onBeforeUnmount(() => {
   console.log('👋 Component unmounting')
+  
+  // Clean up click listener
+  document.removeEventListener('click', () => {
+    showContextMenu.value = false
+  })
 })
 
 // -------------------------
@@ -1920,12 +2009,39 @@ watch(showAttachModal, (val) => {
         </div>
       </div>
     </div>
+
+    <!-- Context Menu -->
+    <div 
+      v-if="showContextMenu" 
+      class="context-menu"
+      :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px' }"
+      @click="showContextMenu = false"
+      v-html="contextMenuContent"
+    ></div>
   </div>
 </template>
 
 <style>
 @import 'tabulator-tables/dist/css/tabulator_modern.min.css';
 @import '../styles/styles.css';
+
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  min-width: 300px;
+  max-width: 400px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.context-menu:hover {
+  background: #f8f9fa;
+}
 </style>
 
 <style scoped>
