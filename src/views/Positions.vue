@@ -30,8 +30,12 @@ const q = useCallPositionsQuery(props.symbolRoot, props.userId)
 const {
   positionTradesMap,
   positionPositionsMap,
+  positionOrdersMap,
   getPositionKey,
   getAttachedTrades,
+  fetchOrdersForSymbol,
+  getAttachedOrders,
+  savePositionOrderMappings,
   fetchAttachedPositionsForDisplay,
   fetchTradesForSymbol,
   isReady,
@@ -244,6 +248,7 @@ const columns: ColumnDefinition[] = [
       const posKey = getRowPositionKey(data)
       const attachedTradeIds = positionTradesMap.value.get(posKey)
       const attachedPositionKeys = positionPositionsMap.value.get(posKey)
+      const attachedOrderIds = positionOrdersMap.value.get(posKey)
       
       //console.log('🔍 Position Key:', positionTradesMap.value)
       console.log('🎨 Formatter for', posKey, {
@@ -252,7 +257,8 @@ const columns: ColumnDefinition[] = [
       })
       
       const hasAttachments = (attachedTradeIds && attachedTradeIds.size > 0) || 
-                            (attachedPositionKeys && attachedPositionKeys.size > 0)
+                            (attachedPositionKeys && attachedPositionKeys.size > 0) ||
+                            (attachedOrderIds && attachedOrderIds.size > 0)
       const isExpanded = expandedPositions.value.has(posKey)
       
       const expandArrow = hasAttachments
@@ -261,7 +267,7 @@ const columns: ColumnDefinition[] = [
           </span>`
         : '<span class="expand-arrow">&nbsp;</span>'
       
-      const totalAttachments = (attachedTradeIds?.size || 0) + (attachedPositionKeys?.size || 0)
+      const totalAttachments = (attachedTradeIds?.size || 0) + (attachedPositionKeys?.size || 0) + (attachedOrderIds?.size || 0)
       const attachmentLabel = totalAttachments > 0 
         ? `<span class="trade-count">(${totalAttachments})</span>`
         : ''
@@ -547,6 +553,7 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
       const posKey = getRowPositionKey(data)
       const attachedTradeIds = positionTradesMap.value.get(posKey)
       const attachedPositionKeys = positionPositionsMap.value.get(posKey)
+      const attachedOrderIds = positionOrdersMap.value.get(posKey)
       const isExpanded = expandedPositions.value.has(posKey)
       
       console.log('🎨 Row formatter running for:', posKey, {
@@ -571,7 +578,8 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
 
       if (isExpanded && (
         (attachedTradeIds && attachedTradeIds.size > 0) || 
-        (attachedPositionKeys && attachedPositionKeys.size > 0)
+        (attachedPositionKeys && attachedPositionKeys.size > 0) ||
+        (attachedOrderIds && attachedOrderIds.size > 0)
       )) {
         console.log('📦 Creating nested tables for:', posKey)
         processingPositions.value.add(posKey)
@@ -876,6 +884,100 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
                     const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
                     return `<span style="color:${color}">${Number(value).toFixed(3)}</span>`
                   }
+                }
+              ]
+            })
+          }
+
+          // Add Orders section
+          const attachedOrderIds = positionOrdersMap.value.get(posKey)
+          //console.log('👀 Attached order IDs for', posKey, attachedOrderIds)
+          if (isExpanded && attachedOrderIds && attachedOrderIds.size > 0) {
+            console.log('📦 Adding orders section for:', posKey)
+            const ordersTitle = document.createElement('h4')
+            ordersTitle.textContent = `Attached Orders (${attachedOrderIds.size})`
+            ordersTitle.style.cssText = 'margin: 1rem 0 0.5rem 0; font-size: 0.9rem; color: #495057;'
+            container.appendChild(ordersTitle)
+
+            const ordersTableDiv = document.createElement('div')
+            ordersTableDiv.className = 'nested-orders-table'
+            container.appendChild(ordersTableDiv)
+
+            const ordersData = await getAttachedOrders(data)
+            //console.log('✅ Got orders data:', ordersData.length)
+
+            new Tabulator(ordersTableDiv, {
+              data: ordersData,
+              layout: 'fitColumns',
+              columns: [
+                { 
+                  title: 'Financial instruments', 
+                  field: 'symbol', 
+                  widthGrow: 1.8,
+                  formatter: (cell: any) => {
+                    const tags = extractTagsFromTradesSymbol(cell.getValue())
+                    return tags.map((tag: string) => `<span class="fi-tag">${tag}</span>`).join(' ')
+                  }
+                },
+                { 
+                  title: 'Side', 
+                  field: 'buySell', 
+                  widthGrow: 1,
+                  formatter: (cell: any) => {
+                    const side = cell.getValue()
+                    const className = side === 'BUY' ? 'trade-buy' : 'trade-sell'
+                    return `<span class="trade-side-badge ${className}">${side}</span>`
+                  }
+                },
+                { 
+                  title: 'Order Date', 
+                  field: 'dateTime', 
+                  widthGrow: 1,
+                  formatter: (cell: any) => formatTradeDate(cell.getValue()),
+                  sorter: (a: any, b: any) => {
+                    const dateA = new Date(formatTradeDate(a))
+                    const dateB = new Date(formatTradeDate(b))
+                    return dateA.getTime() - dateB.getTime()
+                  }
+                },
+                { 
+                  title: 'Accounting Quantity', 
+                  field: 'quantity', 
+                  widthGrow: 1,
+                  hozAlign: 'right',
+                  //formatter: (cell: any) => formatNumber(parseFloat(cell.getValue()) || 0)
+                  formatter: (cell: any) => {
+                    const value = cell.getValue()
+                    if (value === null || value === undefined) return '-'
+                    const data = cell.getData()
+                    if (data.assetCategory === 'OPT') {
+                      return data.quantity * 100
+                    } else if (data.assetCategory === 'STK') {
+                      return data.quantity * 1
+                    }
+                    
+                    return formatNumber(data.quantity)
+                  },
+                },
+                { 
+                  title: 'Trade Price', 
+                  field: 'tradePrice', 
+                  widthGrow: 1,
+                  hozAlign: 'right',
+                  formatter: (cell: any) => formatCurrency(parseFloat(cell.getValue()) || 0)
+                },
+                { 
+                  title: 'Trade Money', 
+                  field: 'tradeMoney', 
+                  widthGrow: 1,
+                  hozAlign: 'right',
+                  formatter: (cell: any) => formatCurrency(parseFloat(cell.getValue()) || 0)
+                },
+                { 
+                  title: 'Settlement Date', 
+                  field: 'settleDateTarget', 
+                  widthGrow: 1,
+                  formatter: (cell: any) => formatSettleDateTarget(cell.getValue())
                 }
               ]
             })
@@ -1325,16 +1427,19 @@ onBeforeUnmount(() => {
 // Attach trades / positions
 // -------------------------
 const showAttachModal = ref(false)
-const attachmentTab = ref<'trades' | 'positions'>('trades')
+const attachmentTab = ref<'trades' | 'positions' | 'orders'>('trades')
 const selectedPositionForTrades = ref<any | null>(null)
 const selectedPositionForPositions = ref<any | null>(null)
+const selectedOrderIds = ref<Set<string>>(new Set())
 const tradeSearchQuery = ref('')
 const positionSearchQuery = ref('')
+const orderSearchQuery = ref('')
 const selectedTradeIds = ref<Set<string>>(new Set())
 const selectedPositionKeys = ref<Set<string>>(new Set())
 const loadingAttachable = ref(false)
 const attachableTrades = ref<any[]>([])
 const attachablePositions = ref<any[]>([])
+const attachableOrders = ref<any[]>([])
 
 function toggleTradeSelection(id: string) {
   if (selectedTradeIds.value.has(id)) selectedTradeIds.value.delete(id)
@@ -1344,6 +1449,11 @@ function toggleTradeSelection(id: string) {
 function togglePositionSelection(key: string) {
   if (selectedPositionKeys.value.has(key)) selectedPositionKeys.value.delete(key)
   else selectedPositionKeys.value.add(key)
+}
+
+function toggleOrderSelection(id: string) {
+  if (selectedOrderIds.value.has(id)) selectedOrderIds.value.delete(id)
+  else selectedOrderIds.value.add(id)
 }
 
 async function loadAttachableTradesForPosition(position: any) {
@@ -1386,22 +1496,60 @@ async function loadAttachablePositionsForPosition(position: any) {
   }
 }
 
-async function openAttachModal(position: any, tab: 'trades' | 'positions' = 'trades') {
+
+async function loadAttachableOrdersForPosition(position: any) {
+  loadingAttachable.value = true
+  attachableOrders.value = []
+  try {
+    const symbolRoot = extractTagsFromSymbol(position.symbol)[0] || ''
+    if (!symbolRoot) return
+    const allOrders = await fetchOrdersForSymbol(symbolRoot, position.internal_account_id)
+    const q = orderSearchQuery.value.trim().toLowerCase()
+    attachableOrders.value = q
+      ? allOrders.filter((o: any) => (o.symbol || '').toLowerCase().includes(q) || String(o.orderID || '').toLowerCase().includes(q))
+      : allOrders
+  } catch (err) {
+    console.error('❌ loadAttachableOrdersForPosition error:', err)
+    attachableOrders.value = []
+  } finally {
+    loadingAttachable.value = false
+  }
+}
+
+async function openAttachModal(position: any, tab: 'trades' | 'positions' | 'orders' = 'trades') {
   selectedPositionForTrades.value = position
   selectedPositionForPositions.value = position
   attachmentTab.value = tab
   tradeSearchQuery.value = ''
   positionSearchQuery.value = ''
+  orderSearchQuery.value = ''
 
   const posKey = getPositionKey(position)
   selectedTradeIds.value = new Set(positionTradesMap.value.get(posKey) || [])
   selectedPositionKeys.value = new Set(positionPositionsMap.value.get(posKey) || [])
+  selectedOrderIds.value = new Set(positionOrdersMap.value.get(posKey) || [])
 
   showAttachModal.value = true
   if (tab === 'trades') {
     await loadAttachableTradesForPosition(position)
-  } else {
+  } else if (tab === 'positions') {
     await loadAttachablePositionsForPosition(position)
+  } else {
+    await loadAttachableOrdersForPosition(position)
+  }
+}
+
+async function saveAttachedOrders() {
+  if (!selectedPositionForTrades.value || !props.userId) return
+  const posKey = getPositionKey(selectedPositionForTrades.value)
+  try {
+    await savePositionOrderMappings(supabase, props.userId, posKey, selectedOrderIds.value)
+    if (refetchMappings) await refetchMappings()
+    showAttachModal.value = false
+    if (tabulator.value) tabulator.value.redraw(true)
+    //console.log('✅ Orders attached')
+  } catch (err: any) {
+    console.error('❌ Error saving attached orders:', err)
   }
 }
 
@@ -1447,6 +1595,32 @@ function isPositionExpired(position: Position): boolean {
   
   return expiryDate < today
 }
+
+
+function formatSettleDateTarget(dateStr: string): string {
+  const val = dateStr
+  if (!val) return ''
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/.exec(String(val).trim())
+  let dt: Date
+  if (m) {
+    const day = Number(m[1])
+    const month = Number(m[2]) - 1
+    let year = Number(m[3])
+    if (year < 100) year += 2000
+    dt = new Date(year, month, day)
+  } else {
+    dt = new Date(val)
+    if (isNaN(dt.getTime())) return String(val)
+  }
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+watch([q.isSuccess, () => q.data.value], async ([success, dataValue]) => {
+  if (success && dataValue && dataValue.length > 0 && tableDiv.value && !isTableInitialized.value) {
+    await nextTick()
+    initializeTabulator()
+  }
+}, { immediate: true })
 
 function formatDateWithTimePST(dateStr: string): string {
   if (!dateStr) return ''
@@ -1569,6 +1743,11 @@ watch(showAttachModal, (val) => {
               :class="{ active: attachmentTab === 'positions' }"
               @click="attachmentTab = 'positions'; loadAttachablePositionsForPosition(selectedPositionForPositions)"
             >Positions</button>
+             <button
+              class="tab-button"
+              :class="{ active: attachmentTab === 'orders' }"
+              @click="attachmentTab = 'orders'; loadAttachableOrdersForPosition(selectedPositionForTrades)"
+            >Orders</button>
           </div>
 
           <!-- Trades tab -->
@@ -1624,7 +1803,7 @@ watch(showAttachModal, (val) => {
           </div>
 
           <!-- Positions tab -->
-          <div v-else>
+          <div v-else-if="attachmentTab === 'positions'">
             <div class="trade-search">
               <input
                 v-model="positionSearchQuery"
@@ -1676,17 +1855,67 @@ watch(showAttachModal, (val) => {
               </div>
             </div>
           </div>
+          <div v-else>
+            <div class="trade-search">
+              <input
+                v-model="orderSearchQuery"
+                type="text"
+                class="search-input"
+                placeholder="Search orders (e.g., 'Put' or 'Call, 250')..."
+                @input="loadAttachableOrdersForPosition(selectedPositionForTrades)"
+              />
+              <div class="search-hint">💡 <em>Showing orders with same underlying symbol. Use commas to search multiple terms.</em></div>
+            </div>
+
+            <div v-if="loadingAttachable" style="padding:1rem;text-align:center;color:#6c757d;">Loading orders...</div>
+
+            <div class="trades-list" v-else>
+              <div
+                v-for="o in attachableOrders"
+                :key="o.id"
+                class="trade-item"
+                :class="{ selected: selectedOrderIds.has(String(o.id)) }"
+                @click="toggleOrderSelection(String(o.id))"
+              >
+                <input
+                  type="checkbox"
+                  :checked="selectedOrderIds.has(String(o.id))"
+                  @click.stop="toggleOrderSelection(String(o.id))"
+                />
+                <div class="trade-details">
+                  <div class="trade-primary">
+                    <strong>
+                      <span v-for="tag in extractTagsFromTradesSymbol(o.symbol)" :key="tag" class="fi-tag position-tag">{{ tag }}</span>
+                    </strong>
+                    <span style="color:#6c757d;">Qty: {{ o.contract_quantity }}</span>
+                    <span style="color:#6c757d;">· Trade price: {{ formatCurrency(o.tradePrice) }}</span>
+                  </div>
+                  <div class="trade-secondary">
+                    <span>{{ o.assetCategory }}</span>
+                    <span v-if="o.tradeMoney">• Trade money: {{ formatCurrency(o.tradeMoney) }}</span>
+                    <span> • </span>
+                    <span>Settlement Date: {{ formatSettleDateTarget(o.settleDateTarget) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="attachableOrders.length === 0" style="padding:1.5rem;text-align:center;color:#6c757d;">
+                No orders found
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="showAttachModal = false">Cancel</button>
           <button
             class="btn btn-primary"
-            :disabled="attachmentTab === 'trades' ? selectedTradeIds.size === 0 : selectedPositionKeys.size === 0"
-            @click="attachmentTab === 'trades' ? saveAttachedTrades() : saveAttachedPositions()"
+            :disabled="attachmentTab === 'trades' ? selectedTradeIds.size === 0 : attachmentTab === 'positions' ? selectedPositionKeys.size === 0 : selectedOrderIds.size === 0"
+            @click="attachmentTab === 'trades' ? saveAttachedTrades() : attachmentTab === 'positions' ? saveAttachedPositions() : saveAttachedOrders()"
           >
-            Attach {{ attachmentTab === 'trades' ? selectedTradeIds.size : selectedPositionKeys.size }} 
-            {{ attachmentTab === 'trades' ? 'Trade(s)' : 'Position(s)' }}
+            Attach {{ attachmentTab === 'trades' ? selectedTradeIds.size : attachmentTab === 'positions' ? selectedPositionKeys.size : selectedOrderIds.size }} 
+            {{ attachmentTab === 'trades' ? 'Trade(s)' : attachmentTab === 'positions' ? 'Position(s)' : 'Order(s)' }}
           </button>
         </div>
       </div>
