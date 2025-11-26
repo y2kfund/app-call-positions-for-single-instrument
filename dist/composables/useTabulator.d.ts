@@ -1,16 +1,16 @@
-import { Ref, ComputedRef } from 'vue';
-import { ColumnDefinition } from 'tabulator-tables';
+import { Ref } from 'vue';
 interface UseTabulatorOptions {
-    data: ComputedRef<any[] | undefined>;
-    columns: ColumnDefinition[];
-    isSuccess: ComputedRef<boolean>;
+    data: any;
+    columns: any[];
+    isSuccess: any;
     placeholder?: string;
-    rowFormatter?: (row: any) => void | Promise<void>;
+    rowFormatter?: (row: any) => Promise<void> | void;
+    onTableCreated?: (table: any) => void;
 }
 export declare function useTabulator(options: UseTabulatorOptions): {
     tableDiv: Ref<HTMLDivElement | null, HTMLDivElement | null>;
     tabulator: any;
-    initializeTabulator: () => void;
     isTableInitialized: Ref<boolean, boolean>;
+    initializeTabulator: () => void;
 };
 export {};

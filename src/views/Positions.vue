@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onBeforeUnmount, nextTick, ref, watch } from 'vue'
+import { computed, onMounted, onBeforeUnmount, nextTick, ref, watch, inject } from 'vue'
 import type { ColumnDefinition } from 'tabulator-tables'
 import { useCallPositionsQuery } from '@y2kfund/core/callPositionsForSingleInstrument'
 import { useSupabase, fetchPositionsBySymbolRoot, savePositionTradeMappings, savePositionPositionMappings, type Position } from '@y2kfund/core'
@@ -21,7 +21,11 @@ const props = withDefaults(defineProps<callPositionsProps>(), {
 const supabase = useSupabase()
 
 // Active tab state
+const eventBus = inject<any>('eventBus')
 const activeTab = ref<'current' | 'expired'>('current')
+const accountFilter = ref<string | null>(parseAccountFilterFromUrl())
+const expiryDateFilter = ref<string | null>(parseExpiryDateFilterFromUrl())
+const strikePriceFilter = ref<string | null>(parseStrikePriceFilterFromUrl())
 
 // Query call positions
 const q = useCallPositionsQuery(props.symbolRoot, props.userId)
@@ -60,6 +64,8 @@ const showContextMenu = ref(false)
 const contextMenuX = ref(0)
 const contextMenuY = ref(0)
 const contextMenuContent = ref('')
+
+//const accountFilter = ref<string | null>(null)
 
 // Helper functions
 function extractTagsFromSymbol(symbolText: string): string[] {
@@ -158,6 +164,21 @@ function formatNumber(value: number): string {
   }).format(value)
 }
 
+function parseAccountFilterFromUrl(): string | null {
+  const url = new URL(window.location.href)
+  return url.searchParams.get('all_cts_clientId') || null
+}
+
+function parseExpiryDateFilterFromUrl(): string | null {
+  const url = new URL(window.location.href)
+  return url.searchParams.get('expiryDate') || null
+}
+
+function parseStrikePriceFilterFromUrl(): string | null {
+  const url = new URL(window.location.href)
+  return url.searchParams.get('strikePrice') || null
+}
+
 function togglePositionExpansion(positionKey: string) {
   console.log('🔄 Toggle expansion for key:', positionKey)
   console.log('📊 Before toggle - expanded positions:', Array.from(expandedPositions.value))
@@ -231,6 +252,108 @@ function calculateDTE(symbolText: string): number | null {
   return diffDays
 }
 
+const activeFilters = computed(() => {
+  const filters: Array<{ field: string; label: string; value: string }> = []
+  
+  if (accountFilter.value) {
+    filters.push({
+      field: 'legal_entity',
+      label: 'Account',
+      value: accountFilter.value
+    })
+  }
+
+  if (expiryDateFilter.value) {
+    filters.push({
+      field: 'expiry_date',
+      label: 'Expiry Date',
+      value: expiryDateFilter.value
+    })
+  }
+  
+  if (strikePriceFilter.value) {
+    filters.push({
+      field: 'strike_price',
+      label: 'Strike Price',
+      value: strikePriceFilter.value
+    })
+  }
+  
+  return filters
+})
+
+function clearFilter(field: string) {
+  const url = new URL(window.location.href)
+  
+  if (field === 'legal_entity') {
+    accountFilter.value = null
+    url.searchParams.delete('all_cts_clientId')
+    
+    // Emit event
+    if (eventBus) {
+      eventBus.emit('account-filter-changed', {
+        accountId: null,
+        source: 'call-positions'
+      })
+    }
+  } else if (field === 'expiry_date') {
+    expiryDateFilter.value = null
+    url.searchParams.delete('expiryDate')
+    
+    // Emit event
+    if (eventBus) {
+      eventBus.emit('expiry-date-filter-changed', {
+        expiryDate: null,
+        source: 'call-positions'
+      })
+    }
+  } else if (field === 'strike_price') {
+    strikePriceFilter.value = null
+    url.searchParams.delete('strikePrice')
+    
+    // Emit event
+    if (eventBus) {
+      eventBus.emit('strike-price-filter-changed', {
+        strikePrice: null,
+        source: 'call-positions'
+      })
+    }
+  }
+  
+  window.history.replaceState({}, '', url.toString())
+  updateFilters()
+}
+
+function clearAllFilters() {
+  accountFilter.value = null
+  expiryDateFilter.value = null
+  strikePriceFilter.value = null
+  
+  const url = new URL(window.location.href)
+  url.searchParams.delete('all_cts_clientId')
+  url.searchParams.delete('expiryDate')
+  url.searchParams.delete('strikePrice')
+  
+  window.history.replaceState({}, '', url.toString())
+  updateFilters()
+  
+  // Emit events to clear all filters in other components
+  if (eventBus) {
+    eventBus.emit('account-filter-changed', {
+      accountId: null,
+      source: 'call-positions'
+    })
+    eventBus.emit('expiry-date-filter-changed', {
+      expiryDate: null,
+      source: 'call-positions'
+    })
+    eventBus.emit('strike-price-filter-changed', {
+      strikePrice: null,
+      source: 'call-positions'
+    })
+  }
+}
+
 // Define columns with expansion support
 const columns: ColumnDefinition[] = [
   {
@@ -284,12 +407,15 @@ const columns: ColumnDefinition[] = [
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
       </button>`
+
+      const isFiltered = accountFilter.value === accountName
+      const accountClass = isFiltered ? 'account-filtered' : 'account-clickable'
       
       return `
         <div style="display: flex; align-items: center; gap: 6px;">
           ${expandArrow} 
           ${attachButton} 
-          <span>${accountName}</span>
+          <span class="${accountClass}" data-account="${accountName}">${accountName}</span>
           ${attachmentLabel}
         </div>
       `
@@ -316,6 +442,16 @@ const columns: ColumnDefinition[] = [
         }
         return
       }
+
+      const accountSpan = target.closest('.account-clickable, .account-filtered')
+      if (accountSpan) {
+        e.stopPropagation()
+        const accountName = accountSpan.getAttribute('data-account')
+        if (accountName) {
+          handleAccountFilter(accountName)
+        }
+        return
+      }
     }
   },
   { 
@@ -328,9 +464,29 @@ const columns: ColumnDefinition[] = [
       const row = cell.getRow().getData()
       if (row.asset_class === 'OPT') {
         const tags = extractTagsFromSymbol(row.symbol)
-        return tags[2] || '<span style="color:#aaa;font-style:italic;">Unknown</span>'
+        const strikePrice = tags[2] || ''
+        
+        if (strikePrice) {
+          const isFiltered = strikePriceFilter.value === strikePrice
+          const strikeClass = isFiltered ? 'strike-filtered' : 'strike-clickable'
+          return `<span class="${strikeClass}" data-strike="${strikePrice}">${strikePrice}</span>`
+        }
+        
+        return '<span style="color:#aaa;font-style:italic;">Unknown</span>'
       }
       return '<span style="color:#aaa;font-style:italic;">Not applicable</span>'
+    },
+    cellClick: (e: any, cell: any) => {
+      const target = e.target as HTMLElement
+      const strikeSpan = target.closest('.strike-clickable, .strike-filtered')
+      
+      if (strikeSpan) {
+        e.stopPropagation()
+        const strikePrice = strikeSpan.getAttribute('data-strike')
+        if (strikePrice) {
+          handleStrikePriceFilter(strikePrice)
+        }
+      }
     }
   },
   { 
@@ -343,9 +499,29 @@ const columns: ColumnDefinition[] = [
       const row = cell.getRow().getData()
       if (row.asset_class === 'OPT') {
         const tags = extractTagsFromSymbol(row.symbol)
-        return tags[1] || '<span style="color:#aaa;font-style:italic;">Unknown</span>'
+        const expiryDate = tags[1] || ''
+        
+        if (expiryDate) {
+          const isFiltered = expiryDateFilter.value === expiryDate
+          const expiryClass = isFiltered ? 'expiry-filtered' : 'expiry-clickable'
+          return `<span class="${expiryClass}" data-expiry="${expiryDate}">${expiryDate}</span>`
+        }
+        
+        return '<span style="color:#aaa;font-style:italic;">Unknown</span>'
       }
       return '<span style="color:#aaa;font-style:italic;">Not applicable</span>'
+    },
+    cellClick: (e: any, cell: any) => {
+      const target = e.target as HTMLElement
+      const expirySpan = target.closest('.expiry-clickable, .expiry-filtered')
+      
+      if (expirySpan) {
+        e.stopPropagation()
+        const expiryDate = expirySpan.getAttribute('data-expiry')
+        if (expiryDate) {
+          handleExpiryDateFilter(expiryDate)
+        }
+      }
     },
     sorter: (a: any, b: any, aRow: any, bRow: any) => {
       const aData = aRow.getData()
@@ -614,6 +790,31 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
   columns,
   isSuccess: q.isSuccess,
   placeholder: 'No call positions available',
+  onTableCreated: (table: any) => {
+    console.log('🎯 Table created, applying initial filters')
+    
+    const hasFilters = accountFilter.value || expiryDateFilter.value || strikePriceFilter.value
+    
+    if (hasFilters) {
+      table.setFilter((data: any) => {
+        if (accountFilter.value && data.legal_entity !== accountFilter.value) return false
+        
+        if (expiryDateFilter.value) {
+          if (data.asset_class !== 'OPT') return false
+          const tags = extractTagsFromSymbol(data.symbol)
+          if (tags[1] !== expiryDateFilter.value) return false
+        }
+        
+        if (strikePriceFilter.value) {
+          if (data.asset_class !== 'OPT') return false
+          const tags = extractTagsFromSymbol(data.symbol)
+          if (tags[2] !== strikePriceFilter.value) return false
+        }
+        
+        return true
+      })
+    }
+  },
   rowFormatter: async (row: any) => {
     try {
       const data = row.getData()
@@ -1094,6 +1295,41 @@ const {
   columns,
   isSuccess: expiredIsSuccess,
   placeholder: 'No expired positions available',
+  onTableCreated: (table: any) => {
+    console.log('🎯 Expired table created, applying initial filters')
+    const filters: any[] = []
+    
+    if (accountFilter.value) {
+      console.log('📌 Applying account filter to expired table:', accountFilter.value)
+      filters.push({
+        field: 'legal_entity',
+        type: '=',
+        value: accountFilter.value
+      })
+    }
+    
+    if (expiryDateFilter.value) {
+      console.log('📌 Applying expiry date filter to expired table:', expiryDateFilter.value)
+      filters.push((data: any) => {
+        if (data.asset_class !== 'OPT') return false
+        const tags = extractTagsFromSymbol(data.symbol)
+        return tags[1] === expiryDateFilter.value
+      })
+    }
+    
+    if (strikePriceFilter.value) {
+      console.log('📌 Applying strike price filter to expired table:', strikePriceFilter.value)
+      filters.push((data: any) => {
+        if (data.asset_class !== 'OPT') return false
+        const tags = extractTagsFromSymbol(data.symbol)
+        return tags[2] === strikePriceFilter.value
+      })
+    }
+    
+    if (filters.length > 0) {
+      table.setFilter(filters)
+    }
+  },
   rowFormatter: async (row: any) => {
     // Same rowFormatter as current positions
     try {
@@ -1470,7 +1706,247 @@ function isExpired(symbolText: string): boolean {
   return expiry < today
 }
 
+function handleAccountFilter(accountName: string) {
+  const url = new URL(window.location.href)
+  
+  // Toggle filter
+  if (accountFilter.value === accountName) {
+    // Clear filter
+    accountFilter.value = null
+    url.searchParams.delete('all_cts_clientId')
+  } else {
+    // Set filter
+    accountFilter.value = accountName
+    url.searchParams.set('all_cts_clientId', accountName)
+  }
+  
+  window.history.replaceState({}, '', url.toString())
+  updateFilters()
+  
+  // Emit event to other components
+  if (eventBus) {
+    eventBus.emit('account-filter-changed', {
+      accountId: accountFilter.value,
+      source: 'call-positions'
+    })
+  }
+}
+
+function handleExpiryDateFilter(expiryDate: string) {
+  const url = new URL(window.location.href)
+  
+  // Toggle filter
+  if (expiryDateFilter.value === expiryDate) {
+    // Clear filter
+    expiryDateFilter.value = null
+    url.searchParams.delete('expiryDate')
+  } else {
+    // Set filter
+    expiryDateFilter.value = expiryDate
+    url.searchParams.set('expiryDate', expiryDate)
+  }
+  
+  window.history.replaceState({}, '', url.toString())
+  updateFilters()
+  
+  // Emit event to other components
+  if (eventBus) {
+    eventBus.emit('expiry-date-filter-changed', {
+      expiryDate: expiryDateFilter.value,
+      source: 'call-positions'
+    })
+  }
+}
+
+function handleStrikePriceFilter(strikePrice: string) {
+  const url = new URL(window.location.href)
+  
+  // Toggle filter
+  if (strikePriceFilter.value === strikePrice) {
+    // Clear filter
+    strikePriceFilter.value = null
+    url.searchParams.delete('strikePrice')
+  } else {
+    // Set filter
+    strikePriceFilter.value = strikePrice
+    url.searchParams.set('strikePrice', strikePrice)
+  }
+  
+  window.history.replaceState({}, '', url.toString())
+  updateFilters()
+  
+  // Emit event to other components
+  if (eventBus) {
+    eventBus.emit('strike-price-filter-changed', {
+      strikePrice: strikePriceFilter.value,
+      source: 'call-positions'
+    })
+  }
+}
+
+// Update the updateFilters function to include account filter (around line 1460)
+// Update the updateFilters function (around line 1515)
+// Update the updateFilters function (around line 1760)
+function updateFilters() {
+  console.log('🔍 Applying filters:', {
+    account: accountFilter.value,
+    expiry: expiryDateFilter.value,
+    strike: strikePriceFilter.value
+  })
+
+  // Update current positions table
+  if (tabulator.value && isTableInitialized.value) {
+    console.log('🔄 Clearing existing filters on current table')
+    tabulator.value.clearFilter()
+
+    // Build a single custom filter function that handles all filters
+    const hasFilters = accountFilter.value || expiryDateFilter.value || strikePriceFilter.value
+
+    if (hasFilters) {
+      console.log('✅ Applying combined filter function')
+      
+      tabulator.value.setFilter((data: any) => {
+        // Account filter
+        if (accountFilter.value) {
+          if (data.legal_entity !== accountFilter.value) {
+            return false
+          }
+        }
+
+        // Expiry date filter
+        if (expiryDateFilter.value) {
+          if (data.asset_class !== 'OPT') return false
+          const tags = extractTagsFromSymbol(data.symbol)
+          const expiryMatch = tags[1] === expiryDateFilter.value
+          console.log('📅 Expiry filter check:', data.symbol, tags[1], 'vs', expiryDateFilter.value, '=', expiryMatch)
+          if (!expiryMatch) return false
+        }
+
+        // Strike price filter
+        if (strikePriceFilter.value) {
+          if (data.asset_class !== 'OPT') return false
+          const tags = extractTagsFromSymbol(data.symbol)
+          const strikeMatch = tags[2] === strikePriceFilter.value
+          console.log('💰 Strike filter check:', data.symbol, 'extracted:', tags[2], 'vs filter:', strikePriceFilter.value, '=', strikeMatch)
+          if (!strikeMatch) return false
+        }
+
+        return true
+      })
+    }
+
+    nextTick(() => {
+      if (tabulator.value) {
+        tabulator.value.redraw(true)
+        console.log('🔄 Table redrawn')
+      }
+    })
+  } else {
+    console.log('⚠️ Table not ready:', {
+      hasTabulator: !!tabulator.value,
+      isInitialized: isTableInitialized.value
+    })
+  }
+
+  // Update expired positions table
+  if (expiredTabulator.value && isExpiredTableInitialized.value) {
+    console.log('🔄 Clearing existing filters on expired table')
+    expiredTabulator.value.clearFilter()
+
+    const hasFilters = accountFilter.value || expiryDateFilter.value || strikePriceFilter.value
+
+    if (hasFilters) {
+      console.log('✅ Applying combined filter function to expired table')
+      
+      expiredTabulator.value.setFilter((data: any) => {
+        // Account filter
+        if (accountFilter.value && data.legal_entity !== accountFilter.value) {
+          return false
+        }
+
+        // Expiry date filter
+        if (expiryDateFilter.value) {
+          if (data.asset_class !== 'OPT') return false
+          const tags = extractTagsFromSymbol(data.symbol)
+          if (tags[1] !== expiryDateFilter.value) return false
+        }
+
+        // Strike price filter
+        if (strikePriceFilter.value) {
+          if (data.asset_class !== 'OPT') return false
+          const tags = extractTagsFromSymbol(data.symbol)
+          if (tags[2] !== strikePriceFilter.value) return false
+        }
+
+        return true
+      })
+    }
+
+    nextTick(() => {
+      if (expiredTabulator.value) {
+        expiredTabulator.value.redraw(true)
+        console.log('🔄 Expired table redrawn')
+      }
+    })
+  }
+}
+
+function handleExternalAccountFilter(payload: { accountId: string | null, source: string }) {
+  console.log('📍 [Call Positions] Received account filter:', payload)
+  if (payload.source === 'call-positions') return // Ignore own events
+
+  // Apply or clear the filter
+  accountFilter.value = payload.accountId
+  const url = new URL(window.location.href)
+  if (payload.accountId) {
+    url.searchParams.set('all_cts_clientId', payload.accountId)
+  } else {
+    url.searchParams.delete('all_cts_clientId')
+  }
+  window.history.replaceState({}, '', url.toString())
+  updateFilters()
+}
+
+function handleExternalExpiryDateFilter(payload: { expiryDate: string | null, source: string }) {
+  console.log('📍 [Call Positions] Received expiry date filter:', payload)
+  if (payload.source === 'call-positions') return // Ignore own events
+
+  // Apply or clear the filter
+  expiryDateFilter.value = payload.expiryDate
+  const url = new URL(window.location.href)
+  if (payload.expiryDate) {
+    url.searchParams.set('expiryDate', payload.expiryDate)
+  } else {
+    url.searchParams.delete('expiryDate')
+  }
+  window.history.replaceState({}, '', url.toString())
+  updateFilters()
+}
+
+function handleExternalStrikePriceFilter(payload: { strikePrice: string | null, source: string }) {
+  console.log('📍 [Call Positions] Received strike price filter:', payload)
+  if (payload.source === 'call-positions') return // Ignore own events
+
+  // Apply or clear the filter
+  strikePriceFilter.value = payload.strikePrice
+  const url = new URL(window.location.href)
+  if (payload.strikePrice) {
+    url.searchParams.set('strikePrice', payload.strikePrice)
+  } else {
+    url.searchParams.delete('strikePrice')
+  }
+  window.history.replaceState({}, '', url.toString())
+  updateFilters()
+}
+
 onMounted(async () => {
+  //accountFilter.value = parseAccountFilterFromUrl()
+  if (eventBus) {
+    eventBus.on('account-filter-changed', handleExternalAccountFilter)
+    eventBus.on('expiry-date-filter-changed', handleExternalExpiryDateFilter)
+    eventBus.on('strike-price-filter-changed', handleExternalStrikePriceFilter)
+  }
+
   console.log('🎬 Component mounted')
   console.log('📊 Query state:', {
     isLoading: q.isLoading.value,
@@ -1487,6 +1963,28 @@ onMounted(async () => {
     showContextMenu.value = false
   })
 })
+
+watch(accountFilter, (newVal, oldVal) => {
+  console.log('🔄 Account filter changed:', { old: oldVal, new: newVal })
+  if (tabulator.value && isTableInitialized.value) {
+    updateFilters()
+  }
+}, { immediate: true })
+
+// Add watchers for new filters
+watch(expiryDateFilter, (newVal, oldVal) => {
+  console.log('🔄 Expiry date filter changed:', { old: oldVal, new: newVal })
+  if (tabulator.value && isTableInitialized.value) {
+    updateFilters()
+  }
+}, { immediate: true })
+
+watch(strikePriceFilter, (newVal, oldVal) => {
+  console.log('🔄 Strike price filter changed:', { old: oldVal, new: newVal })
+  if (tabulator.value && isTableInitialized.value) {
+    updateFilters()
+  }
+}, { immediate: true })
 
 // Watch for when mappings become ready and redraw the table
 watch(isReady, async (ready) => {
@@ -1505,6 +2003,12 @@ watch(isReady, async (ready) => {
 
 onBeforeUnmount(() => {
   console.log('👋 Component unmounting')
+  
+  if (eventBus) {
+    eventBus.off('account-filter-changed', handleExternalAccountFilter)
+    eventBus.off('expiry-date-filter-changed', handleExternalExpiryDateFilter)
+    eventBus.off('strike-price-filter-changed', handleExternalStrikePriceFilter)
+  }
   
   // Clean up click listener
   document.removeEventListener('click', () => {
@@ -1749,6 +2253,17 @@ watch(showAttachModal, (val) => {
       </div>
       <div v-else-if="activeTab === 'expired' && !loadingExpired" class="positions-info">
         Found {{ expiredPositions.length }} expired position(s)
+      </div>
+    </div>
+
+    <div v-if="activeFilters.length > 0" class="filters-bar">
+      <span class="filters-label">Filtered by:</span>
+      <div class="filters-tags">
+        <span v-for="f in activeFilters" :key="`${f.field}-${f.value}`" class="filter-tag">
+          <strong>{{ f.label }}:</strong> {{ f.value }}
+          <button class="tag-clear" @click="clearFilter(f.field)">✕</button>
+        </span>
+        <button class="btn btn-clear-all" @click="clearAllFilters">Clear all</button>
       </div>
     </div>
 

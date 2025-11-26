@@ -3,59 +3,56 @@ import { TabulatorFull as Tabulator } from 'tabulator-tables'
 import type { ColumnDefinition, Options } from 'tabulator-tables'
 
 interface UseTabulatorOptions {
-  data: ComputedRef<any[] | undefined>
-  columns: ColumnDefinition[]
-  isSuccess: ComputedRef<boolean>
+  data: any
+  columns: any[]
+  isSuccess: any
   placeholder?: string
-  rowFormatter?: (row: any) => void | Promise<void>
+  rowFormatter?: (row: any) => Promise<void> | void
+  onTableCreated?: (table: any) => void
 }
 
 export function useTabulator(options: UseTabulatorOptions) {
-  const { data, columns, isSuccess, placeholder = 'No data available', rowFormatter } = options
-  
   const tableDiv = ref<HTMLDivElement | null>(null)
-  const isTableInitialized = ref(false)
   const tabulator = ref<Tabulator | null>(null)
+  const isTableInitialized = ref(false)
 
-  function initializeTabulator() {
+  const initializeTabulator = () => {
     if (!tableDiv.value || isTableInitialized.value) {
-      console.log('⚠️ Cannot initialize: div exists?', !!tableDiv.value, 'already initialized?', isTableInitialized.value)
+      console.log('⏭️ Skipping table init:', { 
+        hasDiv: !!tableDiv.value, 
+        isInitialized: isTableInitialized.value 
+      })
       return
     }
 
-    // Check if element is visible
-    if (tableDiv.value.offsetParent === null) {
-      console.log('⚠️ Table div is not visible, skipping initialization')
-      return
+    console.log('🚀 Initializing tabulator...')
+
+    try {
+      tabulator.value = new Tabulator(tableDiv.value, {
+        data: options.data.value || [],
+        columns: options.columns,
+        layout: 'fitColumns',
+        placeholder: options.placeholder || 'No data available',
+        rowFormatter: options.rowFormatter
+      })
+
+      isTableInitialized.value = true
+      console.log('✅ Tabulator initialized')
+
+      // Call the onTableCreated callback if provided
+      if (options.onTableCreated && tabulator.value) {
+        nextTick(() => {
+          options.onTableCreated!(tabulator.value!)
+        })
+      }
+    } catch (error) {
+      console.error('❌ Error initializing tabulator:', error)
     }
-
-    console.log('🚀 Initializing Tabulator with data:', data.value?.length, 'rows')
-
-    const config: Options = {
-      data: data.value || [],
-      columns,
-      layout: 'fitColumns',
-      placeholder,
-      height: '100%',
-      reactiveData: true,
-      initialSort: [
-        { column: 'expiry_date', dir: 'asc' }
-      ]
-    }
-
-    if (rowFormatter) {
-      config.rowFormatter = rowFormatter
-    }
-
-    tabulator.value = new Tabulator(tableDiv.value, config)
-    isTableInitialized.value = true
-
-    console.log('✅ Tabulator initialized')
   }
 
   // Watch for both success state AND when the element becomes available
   watch(
-    [isSuccess, tableDiv],
+    [options.isSuccess, tableDiv],
     async ([success, element]) => {
       console.log('👀 Tabulator watch triggered:', { success, hasElement: !!element, initialized: isTableInitialized.value })
       
@@ -84,7 +81,7 @@ export function useTabulator(options: UseTabulatorOptions) {
 
   // Watch for data changes
   watch(
-    () => data.value,
+    () => options.data.value,
     (newData) => {
       if (tabulator.value && newData) {
         console.log('🔄 Updating Tabulator data:', newData.length, 'rows')
@@ -96,7 +93,7 @@ export function useTabulator(options: UseTabulatorOptions) {
   return {
     tableDiv,
     tabulator,
-    initializeTabulator,
-    isTableInitialized
+    isTableInitialized,
+    initializeTabulator
   }
 }

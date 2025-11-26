@@ -382,3 +382,137 @@ body.modal-open {
   color: white;
   margin-left: 0.5rem;
 }
+
+
+.filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+
+.filters-label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.filters-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.filter-tag strong {
+  color: #495057;
+}
+
+.tag-clear {
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  font-size: 0.8rem;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.tag-clear:hover {
+  color: #dc3545;
+}
+
+.btn-clear-all {
+  padding: 0.25rem 0.5rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-clear-all:hover {
+  background: #c82333;
+}
+
+/* Account clickable/filtered styles */
+.account-clickable {
+  cursor: pointer;
+  color: #0066cc;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.account-clickable:hover {
+  color: #004499;
+  text-decoration: underline;
+}
+
+.account-filtered {
+  cursor: pointer;
+  color: #0066cc;
+  font-weight: bold;
+  background-color: #e6f2ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.strike-clickable {
+  cursor: pointer;
+  color: #0066cc;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.strike-clickable:hover {
+  color: #004499;
+  text-decoration: underline;
+}
+
+.strike-filtered {
+  cursor: pointer;
+  color: #0066cc;
+  font-weight: bold;
+  background-color: #e6f2ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Expiry date clickable/filtered styles */
+.expiry-clickable {
+  cursor: pointer;
+  color: #0066cc;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.expiry-clickable:hover {
+  color: #004499;
+  text-decoration: underline;
+}
+
+.expiry-filtered {
+  cursor: pointer;
+  color: #0066cc;
+  font-weight: bold;
+  background-color: #e6f2ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
