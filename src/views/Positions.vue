@@ -1296,38 +1296,28 @@ const {
   isSuccess: expiredIsSuccess,
   placeholder: 'No expired positions available',
   onTableCreated: (table: any) => {
-    console.log('🎯 Expired table created, applying initial filters')
-    const filters: any[] = []
+    console.log('🎯 Table created, applying initial filters')
     
-    if (accountFilter.value) {
-      console.log('📌 Applying account filter to expired table:', accountFilter.value)
-      filters.push({
-        field: 'legal_entity',
-        type: '=',
-        value: accountFilter.value
+    const hasFilters = accountFilter.value || expiryDateFilter.value || strikePriceFilter.value
+    
+    if (hasFilters) {
+      table.setFilter((data: any) => {
+        if (accountFilter.value && data.legal_entity !== accountFilter.value) return false
+        
+        if (expiryDateFilter.value) {
+          if (data.asset_class !== 'OPT') return false
+          const tags = extractTagsFromSymbol(data.symbol)
+          if (tags[1] !== expiryDateFilter.value) return false
+        }
+        
+        if (strikePriceFilter.value) {
+          if (data.asset_class !== 'OPT') return false
+          const tags = extractTagsFromSymbol(data.symbol)
+          if (tags[2] !== strikePriceFilter.value) return false
+        }
+        
+        return true
       })
-    }
-    
-    if (expiryDateFilter.value) {
-      console.log('📌 Applying expiry date filter to expired table:', expiryDateFilter.value)
-      filters.push((data: any) => {
-        if (data.asset_class !== 'OPT') return false
-        const tags = extractTagsFromSymbol(data.symbol)
-        return tags[1] === expiryDateFilter.value
-      })
-    }
-    
-    if (strikePriceFilter.value) {
-      console.log('📌 Applying strike price filter to expired table:', strikePriceFilter.value)
-      filters.push((data: any) => {
-        if (data.asset_class !== 'OPT') return false
-        const tags = extractTagsFromSymbol(data.symbol)
-        return tags[2] === strikePriceFilter.value
-      })
-    }
-    
-    if (filters.length > 0) {
-      table.setFilter(filters)
     }
   },
   rowFormatter: async (row: any) => {

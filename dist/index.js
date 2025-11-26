@@ -12180,13 +12180,7 @@ const uo = { class: "call-positions-for-single-instrument-view" }, co = { class:
       isSuccess: ds,
       placeholder: "No expired positions available",
       onTableCreated: (p) => {
-        console.log("🎯 Expired table created, applying initial filters");
-        const u = [];
-        n.value && (console.log("📌 Applying account filter to expired table:", n.value), u.push({
-          field: "legal_entity",
-          type: "=",
-          value: n.value
-        })), r.value && (console.log("📌 Applying expiry date filter to expired table:", r.value), u.push((b) => b.asset_class !== "OPT" ? !1 : N(b.symbol)[1] === r.value)), o.value && (console.log("📌 Applying strike price filter to expired table:", o.value), u.push((b) => b.asset_class !== "OPT" ? !1 : N(b.symbol)[2] === o.value)), u.length > 0 && p.setFilter(u);
+        console.log("🎯 Table created, applying initial filters"), (n.value || r.value || o.value) && p.setFilter((b) => !(n.value && b.legal_entity !== n.value || r.value && (b.asset_class !== "OPT" || N(b.symbol)[1] !== r.value) || o.value && (b.asset_class !== "OPT" || N(b.symbol)[2] !== o.value)));
       },
       rowFormatter: async (p) => {
         try {
@@ -12926,7 +12920,7 @@ const uo = { class: "call-positions-for-single-instrument-view" }, co = { class:
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, Sa = /* @__PURE__ */ Ra(Ea, [["__scopeId", "data-v-1f1851bc"]]);
+}, Sa = /* @__PURE__ */ Ra(Ea, [["__scopeId", "data-v-c1aec526"]]);
 export {
   Sa as callPositions,
   Sa as default
