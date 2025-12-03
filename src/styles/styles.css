@@ -95,6 +95,103 @@
   background: #f8d7da;
   color: #721c24;
 }
+
+/* Rebalance Toggle Switch */
+.rebalance-toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.rebalance-toggle .rebalance-checkbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.rebalance-toggle .rebalance-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 20px;
+}
+
+.rebalance-toggle .rebalance-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.rebalance-toggle .rebalance-checkbox:checked + .rebalance-slider {
+  background-color: #28a745;
+}
+
+.rebalance-toggle .rebalance-checkbox:checked + .rebalance-slider:before {
+  transform: translateX(16px);
+}
+
+.rebalance-toggle .rebalance-slider:hover {
+  background-color: #aaa;
+}
+
+.rebalance-toggle .rebalance-checkbox:checked + .rebalance-slider:hover {
+  background-color: #218838;
+}
+
+/* Rebalance Cell Container */
+.rebalance-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.rebalance-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.3;
+  color: #495057;
+}
+
+.rebalance-info-clickable {
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.rebalance-info-clickable:hover {
+  background-color: #e9ecef;
+}
+
+/* Delta clickable (orange - outside rebalance range) */
+.delta-clickable {
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+}
+
+.delta-clickable:hover {
+  text-decoration-style: solid;
+  opacity: 0.8;
+}
+
 /*.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title {
   padding-right: 0 !important;
 }*/

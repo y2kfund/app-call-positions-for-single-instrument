@@ -6,7 +6,10 @@ import { useSupabase, fetchPositionsBySymbolRoot, savePositionTradeMappings, sav
 import { useTabulator } from '../composables/useTabulator'
 import { useAttachedData } from '../composables/useAttachedData'
 import { usePositionExpansion } from '../composables/usePositionExpansion'
+import { useRebalance, rebalanceEnabledStates, rebalanceSettingsData } from '../composables/useRebalance'
 import { TabulatorFull as Tabulator } from 'tabulator-tables'
+import RebalanceModal from '../components/RebalanceModal.vue'
+import OptimalRebalanceModal from '../components/OptimalRebalanceModal.vue'
 
 interface callPositionsProps {
   symbolRoot: string
@@ -14,7 +17,7 @@ interface callPositionsProps {
 }
 
 const props = withDefaults(defineProps<callPositionsProps>(), {
-  symbolRoot: 'IBIT',
+  symbolRoot: 'META',
   userId: '67e578fd-2cf7-48a4-b028-a11a3f89bb9b'
 })
 
@@ -64,6 +67,28 @@ const showContextMenu = ref(false)
 const contextMenuX = ref(0)
 const contextMenuY = ref(0)
 const contextMenuContent = ref('')
+
+// Use rebalance composable
+const {
+  showRebalanceModal,
+  rebalancePosition,
+  rebalanceForm,
+  isSaving: isRebalanceSaving,
+  isEditing: isRebalanceEditing,
+  showOptimalRebalanceModal,
+  optimalRebalancePosition,
+  closeRebalanceModal,
+  saveRebalanceSettings,
+  handleRebalanceAction,
+  handleToggle,
+  isRebalanceEnabled,
+  setRebalanceEnabled,
+  fetchAllRebalanceSettings,
+  openRebalanceModalForEdit,
+  isDeltaInRange,
+  openOptimalRebalanceModal,
+  closeOptimalRebalanceModal
+} = useRebalance(getPositionKey, props.userId)
 
 //const accountFilter = ref<string | null>(null)
 
@@ -705,8 +730,43 @@ const columns: ColumnDefinition[] = [
     formatter: (cell: any) => {
       const value = cell.getValue()
       if (value == null) return '<span style="color:#aaa;font-style:italic;">N/A</span>'
-      const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
+      
+      const data = cell.getRow().getData()
+      const positionKey = getPositionKey(data)
+      const hasRebalanceSettings = rebalanceEnabledStates.get(positionKey) ?? false
+      
+      let color = '#000'
+      let isClickable = false
+      
+      if (hasRebalanceSettings) {
+        // Check if delta is within range
+        const inRange = isDeltaInRange(positionKey, value)
+        if (inRange) {
+          color = '#28a745' // Green - within range
+        } else {
+          color = '#fd7e14' // Orange - outside range, needs rebalancing
+          isClickable = true
+        }
+      } else {
+        // Default color logic when no rebalance settings
+        color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
+      }
+      
+      if (isClickable) {
+        return `<span class="delta-clickable" style="color:${color};cursor:pointer;" title="Click to see rebalance options">${Number(value).toFixed(3)}</span>`
+      }
+      
       return `<span style="color:${color}">${Number(value).toFixed(3)}</span>`
+    },
+    cellClick: (e: any, cell: any) => {
+      const target = e.target as HTMLElement
+      
+      // Check if clicked on clickable delta
+      if (target.classList.contains('delta-clickable')) {
+        e.stopPropagation()
+        const data = cell.getRow().getData()
+        openOptimalRebalanceModal(data)
+      }
     }
   },
   { 
@@ -780,6 +840,67 @@ const columns: ColumnDefinition[] = [
         </div>
       </div>`
       showContextMenu.value = true
+    }
+  },
+  {
+    title: 'Rebalance',
+    field: 'rebalance',
+    hozAlign: 'center',
+    headerHozAlign: 'center',
+    widthGrow: 2.5,
+    formatter: (cell: any) => {
+      const data = cell.getRow().getData()
+      const positionKey = getPositionKey(data)
+      const isEnabled = rebalanceEnabledStates.get(positionKey) ?? false
+      const settings = rebalanceSettingsData.get(positionKey)
+      
+      let settingsDisplay = ''
+      if (isEnabled && settings) {
+        settingsDisplay = `
+          <div class="rebalance-info rebalance-info-clickable" title="Click to edit">
+            <span class="rebalance-delta">Delta: ${settings.delta_start}% / ${settings.desired_delta}% / ${settings.delta_end}%</span>
+            <span class="rebalance-dte">DTE: ${settings.dte_start} - ${settings.dte_end}</span>
+          </div>
+        `
+      }
+      
+      return `
+        <div class="rebalance-cell">
+          <label class="rebalance-toggle">
+            <input type="checkbox" class="rebalance-checkbox" ${isEnabled ? 'checked' : ''}>
+            <span class="rebalance-slider"></span>
+          </label>
+          ${settingsDisplay}
+        </div>
+      `
+    },
+    cellClick: (e: any, cell: any) => {
+      const target = e.target as HTMLElement
+      const data = cell.getRow().getData()
+      const positionKey = getPositionKey(data)
+      
+      // Check if clicked on the info text (for editing)
+      const infoElement = target.closest('.rebalance-info-clickable')
+      if (infoElement) {
+        e.stopPropagation()
+        openRebalanceModalForEdit(data)
+        return
+      }
+      
+      // Check if clicked on toggle
+      const checkbox = target.closest('.rebalance-toggle')?.querySelector('.rebalance-checkbox') as HTMLInputElement
+      if (checkbox || target.classList.contains('rebalance-slider') || target.classList.contains('rebalance-toggle')) {
+        e.stopPropagation()
+        const currentState = rebalanceEnabledStates.get(positionKey) ?? false
+        const newState = !currentState
+        
+        handleToggle(data, newState)
+        
+        // Redraw the cell to reflect the new state after modal closes or toggle completes
+        if (!newState) {
+          cell.getRow().reformat()
+        }
+      }
     }
   }
 ]
@@ -1945,6 +2066,9 @@ onMounted(async () => {
     dataLength: q.data.value?.length
   })
   
+  // Load existing rebalance settings to populate toggle states
+  await fetchAllRebalanceSettings()
+  
   // Don't set isTableInitialized manually, let the composable handle it
   // The useTabulator composable will initialize when data is ready
   
@@ -2230,6 +2354,14 @@ watch(showAttachModal, (val) => {
     else document.body.classList.remove('modal-open')
   } catch (e) {
     // ignore for SSR or restricted environments
+  }
+})
+
+// Watch rebalance modal close to refresh toggle states in the table
+watch(showRebalanceModal, (val) => {
+  if (!val && tabulator.value) {
+    // Modal closed, redraw table to update toggle states
+    tabulator.value.redraw(true)
   }
 })
 </script>
@@ -2523,6 +2655,25 @@ watch(showAttachModal, (val) => {
       @click="showContextMenu = false"
       v-html="contextMenuContent"
     ></div>
+
+    <!-- Rebalance Modal -->
+    <RebalanceModal
+      :show="showRebalanceModal"
+      :position="rebalancePosition"
+      :form="rebalanceForm"
+      :is-saving="isRebalanceSaving"
+      :is-editing="isRebalanceEditing"
+      @close="closeRebalanceModal"
+      @save="saveRebalanceSettings"
+      @update:form="(val) => rebalanceForm = val"
+    />
+
+    <!-- Optimal Rebalance Options Modal -->
+    <OptimalRebalanceModal
+      :show="showOptimalRebalanceModal"
+      :position="optimalRebalancePosition"
+      @close="closeOptimalRebalanceModal"
+    />
   </div>
 </template>
 
