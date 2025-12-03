@@ -847,7 +847,7 @@ const columns: ColumnDefinition[] = [
     field: 'rebalance',
     hozAlign: 'center',
     headerHozAlign: 'center',
-    widthGrow: 2.5,
+    widthGrow: 1,
     formatter: (cell: any) => {
       const data = cell.getRow().getData()
       const positionKey = getPositionKey(data)
@@ -866,11 +866,13 @@ const columns: ColumnDefinition[] = [
       
       return `
         <div class="rebalance-cell">
-          <label class="rebalance-toggle">
-            <input type="checkbox" class="rebalance-checkbox" ${isEnabled ? 'checked' : ''}>
-            <span class="rebalance-slider"></span>
-          </label>
           ${settingsDisplay}
+          <div class="rebalance-toggle-container" title="Enable or disable automatic rebalancing">
+            <label class="rebalance-toggle">
+              <input type="checkbox" class="rebalance-checkbox" ${isEnabled ? 'checked' : ''}>
+              <span class="rebalance-slider"></span>
+            </label>
+          </div>
         </div>
       `
     },

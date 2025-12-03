@@ -12249,7 +12249,7 @@ const zr = { class: "modal-header" }, Fr = { class: "modal-body" }, Pr = {
         field: "rebalance",
         hozAlign: "center",
         headerHozAlign: "center",
-        widthGrow: 2.5,
+        widthGrow: 1,
         formatter: (p) => {
           const f = p.getRow().getData(), b = c(f), m = je.get(b) ?? !1, R = qe.get(b);
           let z = "";
@@ -12260,11 +12260,13 @@ const zr = { class: "modal-header" }, Fr = { class: "modal-body" }, Pr = {
           </div>
         `), `
         <div class="rebalance-cell">
-          <label class="rebalance-toggle">
-            <input type="checkbox" class="rebalance-checkbox" ${m ? "checked" : ""}>
-            <span class="rebalance-slider"></span>
-          </label>
           ${z}
+          <div class="rebalance-toggle-container" title="Enable or disable automatic rebalancing">
+            <label class="rebalance-toggle">
+              <input type="checkbox" class="rebalance-checkbox" ${m ? "checked" : ""}>
+              <span class="rebalance-slider"></span>
+            </label>
+          </div>
         </div>
       `;
         },
@@ -13395,7 +13397,7 @@ const zr = { class: "modal-header" }, Fr = { class: "modal-body" }, Pr = {
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, El = /* @__PURE__ */ gl(ml, [["__scopeId", "data-v-222da56f"]]);
+}, El = /* @__PURE__ */ gl(ml, [["__scopeId", "data-v-b80414a0"]]);
 export {
   El as callPositions,
   El as default
