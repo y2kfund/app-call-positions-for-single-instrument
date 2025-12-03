@@ -38,6 +38,7 @@
   padding: 6px 8px;
   font-size: 0.85rem;
   border-right: 1px solid #e9ecef;
+  height: 35px !important;
 }
 
 .tabulator-row.tabulator-row-even {
@@ -96,12 +97,12 @@
   color: #721c24;
 }
 
-/* Rebalance Toggle Switch */
+/* Rebalance Toggle Switch - Compact Size */
 .rebalance-toggle {
   position: relative;
   display: inline-block;
-  width: 36px;
-  height: 20px;
+  width: 30px;
+  height: 16px;
   cursor: pointer;
 }
 
@@ -120,16 +121,16 @@
   bottom: 0;
   background-color: #ccc;
   transition: 0.3s;
-  border-radius: 20px;
+  border-radius: 16px;
 }
 
 .rebalance-toggle .rebalance-slider:before {
   position: absolute;
   content: "";
-  height: 14px;
-  width: 14px;
-  left: 3px;
-  bottom: 3px;
+  height: 12px;
+  width: 12px;
+  left: 2px;
+  bottom: 2px;
   background-color: white;
   transition: 0.3s;
   border-radius: 50%;
@@ -140,7 +141,7 @@
 }
 
 .rebalance-toggle .rebalance-checkbox:checked + .rebalance-slider:before {
-  transform: translateX(16px);
+  transform: translateX(14px);
 }
 
 .rebalance-toggle .rebalance-slider:hover {
@@ -151,9 +152,10 @@
   background-color: #218838;
 }
 
-/* Rebalance Cell Container */
+/* Rebalance Cell Container - Side by Side Layout */
 .rebalance-cell {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -163,8 +165,14 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  line-height: 1.3;
+  line-height: 1.2;
   color: #495057;
+  font-size: 0.75rem;
+}
+
+.rebalance-info .rebalance-delta,
+.rebalance-info .rebalance-dte {
+  white-space: nowrap;
 }
 
 .rebalance-info-clickable {
