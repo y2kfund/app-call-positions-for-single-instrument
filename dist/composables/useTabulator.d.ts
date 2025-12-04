@@ -6,6 +6,10 @@ interface UseTabulatorOptions {
     placeholder?: string;
     rowFormatter?: (row: any) => Promise<void> | void;
     onTableCreated?: (table: any) => void;
+    initialSort?: Array<{
+        column: string;
+        dir: 'asc' | 'desc';
+    }>;
 }
 export declare function useTabulator(options: UseTabulatorOptions): {
     tableDiv: Ref<HTMLDivElement | null, HTMLDivElement | null>;

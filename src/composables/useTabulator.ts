@@ -9,6 +9,7 @@ interface UseTabulatorOptions {
   placeholder?: string
   rowFormatter?: (row: any) => Promise<void> | void
   onTableCreated?: (table: any) => void
+  initialSort?: Array<{ column: string; dir: 'asc' | 'desc' }>
 }
 
 export function useTabulator(options: UseTabulatorOptions) {
@@ -33,7 +34,8 @@ export function useTabulator(options: UseTabulatorOptions) {
         columns: options.columns,
         layout: 'fitColumns',
         placeholder: options.placeholder || 'No data available',
-        rowFormatter: options.rowFormatter
+        rowFormatter: options.rowFormatter,
+        initialSort: options.initialSort || []
       })
 
       isTableInitialized.value = true

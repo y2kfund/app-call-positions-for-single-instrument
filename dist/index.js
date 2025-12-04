@@ -11179,7 +11179,8 @@ function Gi(l) {
         columns: l.columns,
         layout: "fitColumns",
         placeholder: l.placeholder || "No data available",
-        rowFormatter: l.rowFormatter
+        rowFormatter: l.rowFormatter,
+        initialSort: l.initialSort || []
       }), i.value = !0, console.log("✅ Tabulator initialized"), l.onTableCreated && t.value && Re(() => {
         l.onTableCreated(t.value);
       });
@@ -12502,6 +12503,7 @@ const Xo = { class: "modal-header" }, Jo = { class: "modal-body" }, Yo = {
       columns: Di,
       isSuccess: d.isSuccess,
       placeholder: "No call positions available",
+      initialSort: [{ column: "dte", dir: "asc" }],
       onTableCreated: (p) => {
         console.log("🎯 Table created, applying initial filters"), (n.value || r.value || o.value) && p.setFilter((b) => !(n.value && b.legal_entity !== n.value || r.value && (b.asset_class !== "OPT" || q(b.symbol)[1] !== r.value) || o.value && (b.asset_class !== "OPT" || q(b.symbol)[2] !== o.value)));
       },
@@ -12857,6 +12859,7 @@ const Xo = { class: "modal-header" }, Jo = { class: "modal-body" }, Yo = {
       columns: Di,
       isSuccess: Ns,
       placeholder: "No expired positions available",
+      initialSort: [{ column: "dte", dir: "asc" }],
       onTableCreated: (p) => {
         console.log("🎯 Table created, applying initial filters"), (n.value || r.value || o.value) && p.setFilter((b) => !(n.value && b.legal_entity !== n.value || r.value && (b.asset_class !== "OPT" || q(b.symbol)[1] !== r.value) || o.value && (b.asset_class !== "OPT" || q(b.symbol)[2] !== o.value)));
       },
@@ -13751,7 +13754,7 @@ const Xo = { class: "modal-header" }, Jo = { class: "modal-body" }, Yo = {
   for (const [i, s] of e)
     t[i] = s;
   return t;
-}, Gl = /* @__PURE__ */ Ol(Al, [["__scopeId", "data-v-feb9beca"]]);
+}, Gl = /* @__PURE__ */ Ol(Al, [["__scopeId", "data-v-7fc1aa3f"]]);
 export {
   Gl as callPositions,
   Gl as default
