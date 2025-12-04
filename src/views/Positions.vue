@@ -2449,6 +2449,67 @@ function handleFetchedAtChange() {
   })
 }
 
+
+function formatSettleDateTarget(dateStr: string): string {
+  const val = dateStr
+  if (!val) return ''
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/.exec(String(val).trim())
+  let dt: Date
+  if (m) {
+    const day = Number(m[1])
+    const month = Number(m[2]) - 1
+    let year = Number(m[3])
+    if (year < 100) year += 2000
+    dt = new Date(year, month, day)
+  } else {
+    dt = new Date(val)
+    if (isNaN(dt.getTime())) return String(val)
+  }
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+watch([q.isSuccess, () => q.data.value], async ([success, dataValue]) => {
+  if (success && dataValue && dataValue.length > 0 && tableDiv.value && !isTableInitialized.value) {
+    await nextTick()
+    initializeTabulator()
+  }
+}, { immediate: true })
+
+function formatDateWithTimePST(dateStr: string): string {
+  if (!dateStr) return ''
+  
+  const date = new Date(dateStr)
+  
+  // Format with PST timezone
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZone: 'America/Los_Angeles',
+    timeZoneName: 'short'
+  }).format(date)
+}
+
+
+watch(showAttachModal, (val) => {
+  try {
+    if (val) document.body.classList.add('modal-open')
+    else document.body.classList.remove('modal-open')
+  } catch (e) {
+    // ignore for SSR or restricted environments
+  }
+})
+
+watch(showRebalanceModal, (val) => {
+  if (!val && tabulator.value) {
+    // Modal closed, redraw table to update toggle states
+    tabulator.value.redraw(true)
+  }
+})
+
 // Watch for query data changes when fetched_at changes
 watch([() => q.data.value, selectedFetchedAt], async ([newData, newFetchedAt]) => {
   console.log('🔄 Query data or fetched_at changed:', {
