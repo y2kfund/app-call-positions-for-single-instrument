@@ -11179,9 +11179,13 @@ function Gi(l) {
         columns: l.columns,
         layout: "fitColumns",
         placeholder: l.placeholder || "No data available",
-        rowFormatter: l.rowFormatter,
-        initialSort: l.initialSort || []
-      }), i.value = !0, console.log("✅ Tabulator initialized"), l.onTableCreated && t.value && Re(() => {
+        rowFormatter: l.rowFormatter
+        // Remove initialSort from config
+      }), i.value = !0, console.log("✅ Tabulator initialized"), l.initialSort && l.initialSort.length > 0 && t.value && t.value.on("tableBuilt", () => {
+        console.log("🔄 Table built, applying initial sort to show indicator"), setTimeout(() => {
+          t.value && (t.value.setSort(l.initialSort), console.log("✅ Sort applied with indicator"));
+        }, 50);
+      }), l.onTableCreated && t.value && Re(() => {
         l.onTableCreated(t.value);
       });
     } catch (n) {

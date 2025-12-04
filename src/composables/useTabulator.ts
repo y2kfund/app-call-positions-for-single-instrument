@@ -35,11 +35,24 @@ export function useTabulator(options: UseTabulatorOptions) {
         layout: 'fitColumns',
         placeholder: options.placeholder || 'No data available',
         rowFormatter: options.rowFormatter,
-        initialSort: options.initialSort || []
+        // Remove initialSort from config
       })
 
       isTableInitialized.value = true
       console.log('✅ Tabulator initialized')
+
+      // Wait for table to be fully built, then apply sort
+      if (options.initialSort && options.initialSort.length > 0 && tabulator.value) {
+        tabulator.value.on("tableBuilt", () => {
+          console.log('🔄 Table built, applying initial sort to show indicator')
+          setTimeout(() => {
+            if (tabulator.value) {
+              tabulator.value.setSort(options.initialSort!)
+              console.log('✅ Sort applied with indicator')
+            }
+          }, 50)
+        })
+      }
 
       // Call the onTableCreated callback if provided
       if (options.onTableCreated && tabulator.value) {
