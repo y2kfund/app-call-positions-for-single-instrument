@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onBeforeUnmount, nextTick, ref, watch, inject } from 'vue'
 import type { ColumnDefinition } from 'tabulator-tables'
-import { useCallPositionsQuery } from '@y2kfund/core/callPositionsForSingleInstrument'
+import { useCallPositionsQuery, useAvailableFetchedAtQuery } from '@y2kfund/core/callPositionsForSingleInstrument'
 import { useSupabase, fetchPositionsBySymbolRoot, savePositionTradeMappings, savePositionPositionMappings, type Position } from '@y2kfund/core'
 import { useTabulator } from '../composables/useTabulator'
 import { useAttachedData } from '../composables/useAttachedData'
@@ -30,8 +30,24 @@ const accountFilter = ref<string | null>(parseAccountFilterFromUrl())
 const expiryDateFilter = ref<string | null>(parseExpiryDateFilterFromUrl())
 const strikePriceFilter = ref<string | null>(parseStrikePriceFilterFromUrl())
 
-// Query call positions
-const q = useCallPositionsQuery(props.symbolRoot, props.userId)
+// Add fetched_at selection state
+const selectedFetchedAt = ref<string | null>(null)
+
+// Query available fetched_at timestamps
+const fetchedAtQuery = useAvailableFetchedAtQuery()
+
+// Query call positions with selected fetched_at - FIXED: pass reactive ref
+const q = useCallPositionsQuery(props.symbolRoot, props.userId, selectedFetchedAt)
+
+// Add a separate watch to log when query state changes
+watch(() => q.data.value, (newData) => {
+  console.log('📊 Query data changed:', {
+    length: newData?.length,
+    isLoading: q.isLoading.value,
+    isSuccess: q.isSuccess.value,
+    fetchedAt: selectedFetchedAt.value
+  })
+}, { immediate: true })
 
 // Use attached data composable - CHANGED: removed symbolRoot param
 const {
@@ -1243,6 +1259,12 @@ const { tableDiv, initializeTabulator, isTableInitialized, tabulator } = useTabu
                     if (value == null) return ''
                     const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
                     return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
+                  },
+                  bottomCalc: 'sum',
+                  bottomCalcFormatter: (cell: any) => {
+                    const value = cell.getValue()
+                    const color = value < 0 ? '#dc3545' : value > 0 ? '#28a745' : '#000'
+                    return `<span style="color:${color}">$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>`
                   }
                 },
                 { 
@@ -1659,11 +1681,11 @@ const {
                   }
                 },
                 { 
-                  title: 'Entry Cash<br>Flow', 
+                  title: 'Entry Cash Flow', 
                   field: 'computed_cash_flow_on_entry', 
                   hozAlign: 'right', 
                   headerHozAlign: 'right',
-                  widthGrow: 1,
+                  widthGrow: 1.5,
                   formatter: (cell: any) => {
                     const value = cell.getValue()
                     if (value == null) return ''
@@ -1724,10 +1746,108 @@ const {
             })
           }
 
+          // Add Orders section
+          const attachedOrderIds = positionOrdersMap.value.get(posKey)
+          //console.log('👀 Attached order IDs for', posKey, attachedOrderIds)
+          if (isExpanded && attachedOrderIds && attachedOrderIds.size > 0) {
+            console.log('📦 Adding orders section for:', posKey)
+            const ordersTitle = document.createElement('h4')
+            ordersTitle.textContent = `Attached Orders (${attachedOrderIds.size})`
+            ordersTitle.style.cssText = 'margin: 1rem 0 0.5rem 0; font-size: 0.9rem; color: #495057;'
+            container.appendChild(ordersTitle)
+
+            const ordersTableDiv = document.createElement('div')
+            ordersTableDiv.className = 'nested-orders-table'
+            container.appendChild(ordersTableDiv)
+
+            const ordersData = await getAttachedOrders(data)
+            //console.log('✅ Got orders data:', ordersData.length)
+
+            new Tabulator(ordersTableDiv, {
+              data: ordersData,
+              layout: 'fitColumns',
+              columns: [
+                { 
+                  title: 'Financial instruments', 
+                  field: 'symbol', 
+                  widthGrow: 1.8,
+                  formatter: (cell: any) => {
+                    const tags = extractTagsFromTradesSymbol(cell.getValue())
+                    return tags.map((tag: string) => `<span class="fi-tag">${tag}</span>`).join(' ')
+                  }
+                },
+                { 
+                  title: 'Side', 
+                  field: 'buySell', 
+                  widthGrow: 1,
+                  formatter: (cell: any) => {
+                    const side = cell.getValue()
+                    const className = side === 'BUY' ? 'trade-buy' : 'trade-sell'
+                    return `<span class="trade-side-badge ${className}">${side}</span>`
+                  }
+                },
+                { 
+                  title: 'Order Date', 
+                  field: 'dateTime', 
+                  widthGrow: 1,
+                  formatter: (cell: any) => formatTradeDate(cell.getValue()),
+                  sorter: (a: any, b: any) => {
+                    const dateA = new Date(formatTradeDate(a))
+                    const dateB = new Date(formatTradeDate(b))
+                    return dateA.getTime() - dateB.getTime()
+                  }
+                },
+                { 
+                  title: 'Accounting Quantity', 
+                  field: 'quantity', 
+                  widthGrow: 1,
+                  hozAlign: 'right',
+                  //formatter: (cell: any) => formatNumber(parseFloat(cell.getValue()) || 0)
+                  formatter: (cell: any) => {
+                    const value = cell.getValue()
+                    if (value === null || value === undefined) return '-'
+                    const data = cell.getData()
+                    if (data.assetCategory === 'OPT') {
+                      return data.quantity * 100
+                    } else if (data.assetCategory === 'STK') {
+                      return data.quantity * 1
+                    }
+                    
+                    return formatNumber(data.quantity)
+                  },
+                },
+                { 
+                  title: 'Trade Price', 
+                  field: 'tradePrice', 
+                  widthGrow: 1,
+                  hozAlign: 'right',
+                  formatter: (cell: any) => formatCurrency(parseFloat(cell.getValue()) || 0)
+                },
+                { 
+                  title: 'Trade Money', 
+                  field: 'tradeMoney', 
+                  widthGrow: 1,
+                  hozAlign: 'right',
+                  formatter: (cell: any) => formatCurrency(parseFloat(cell.getValue()) || 0)
+                },
+                { 
+                  title: 'Settlement Date', 
+                  field: 'settleDateTarget', 
+                  widthGrow: 1,
+                  formatter: (cell: any) => formatSettleDateTarget(cell.getValue())
+                }
+              ]
+            })
+          }
+
+          console.log('✅ Appending nested container to row')
           element.appendChild(container)
+        } catch (error) {
+          console.error('❌ Error creating nested tables:', error)
         } finally {
           setTimeout(() => {
             processingPositions.value.delete(posKey)
+            console.log('✅ Removed from processing')
           }, 100)
         }
       }
@@ -2305,67 +2425,66 @@ function isPositionExpired(position: Position): boolean {
   return expiryDate < today
 }
 
-
-function formatSettleDateTarget(dateStr: string): string {
-  const val = dateStr
-  if (!val) return ''
-  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/.exec(String(val).trim())
-  let dt: Date
-  if (m) {
-    const day = Number(m[1])
-    const month = Number(m[2]) - 1
-    let year = Number(m[3])
-    if (year < 100) year += 2000
-    dt = new Date(year, month, day)
-  } else {
-    dt = new Date(val)
-    if (isNaN(dt.getTime())) return String(val)
-  }
-  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
-
-watch([q.isSuccess, () => q.data.value], async ([success, dataValue]) => {
-  if (success && dataValue && dataValue.length > 0 && tableDiv.value && !isTableInitialized.value) {
-    await nextTick()
-    initializeTabulator()
-  }
-}, { immediate: true })
-
-function formatDateWithTimePST(dateStr: string): string {
-  if (!dateStr) return ''
-  
-  const date = new Date(dateStr)
-  
-  // Format with PST timezone
+function formatTimestamp(timestamp: string): string {
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+    month: 'short',
+    day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
     timeZone: 'America/Los_Angeles',
     timeZoneName: 'short'
-  }).format(date)
+  }).format(new Date(timestamp))
 }
 
-// close/open body scroll lock for modal
-watch(showAttachModal, (val) => {
-  try {
-    if (val) document.body.classList.add('modal-open')
-    else document.body.classList.remove('modal-open')
-  } catch (e) {
-    // ignore for SSR or restricted environments
-  }
-})
+// Handle fetched_at selection change
+function handleFetchedAtChange() {
+  console.log('🔄 Fetched_at changed to:', selectedFetchedAt.value || 'latest')
+  console.log('📊 Current query state:', {
+    isLoading: q.isLoading.value,
+    isSuccess: q.isSuccess.value,
+    dataLength: q.data.value?.length,
+    isTableInit: isTableInitialized.value
+  })
+}
 
-// Watch rebalance modal close to refresh toggle states in the table
-watch(showRebalanceModal, (val) => {
-  if (!val && tabulator.value) {
-    // Modal closed, redraw table to update toggle states
-    tabulator.value.redraw(true)
+// Watch for query data changes when fetched_at changes
+watch([() => q.data.value, selectedFetchedAt], async ([newData, newFetchedAt]) => {
+  console.log('🔄 Query data or fetched_at changed:', {
+    dataLength: newData?.length,
+    fetchedAt: newFetchedAt || 'latest',
+    isTableInitialized: isTableInitialized.value
+  })
+  
+  if (newData && newData.length > 0) {
+    await nextTick()
+    
+    if (tabulator.value) {
+      console.log('🗑️ Destroying existing table')
+      try {
+        tabulator.value.destroy()
+        tabulator.value = null
+        isTableInitialized.value = false
+      } catch (error) {
+        console.error('❌ Error destroying table:', error)
+      }
+    }
+    
+    await nextTick()
+    
+    if (tableDiv.value) {
+      console.log('🚀 Creating new table with fetched data')
+      initializeTabulator()
+      
+      // Reapply filters after initialization
+      await nextTick()
+      if (accountFilter.value || expiryDateFilter.value || strikePriceFilter.value) {
+        updateFilters()
+      }
+    }
   }
-})
+}, { deep: true })
 </script>
 
 <template>
@@ -2407,6 +2526,26 @@ watch(showRebalanceModal, (val) => {
       >
         Expired
       </button>
+
+      <div class="fetched-at-selector" v-if="activeTab === 'current'">
+        <label for="fetched-at-select">Data as of:</label>
+        <select 
+          id="fetched-at-select"
+          v-model="selectedFetchedAt"
+          @change="handleFetchedAtChange"
+          class="fetched-at-select"
+        >
+          <option :value="null">Latest</option>
+          <option 
+            v-for="timestamp in fetchedAtQuery.data.value" 
+            :key="timestamp"
+            :value="timestamp"
+          >
+            {{ formatTimestamp(timestamp) }}
+          </option>
+        </select>
+        <span v-if="fetchedAtQuery.isLoading.value" class="loading-indicator">Loading timestamps...</span>
+      </div>
     </div>
 
     <!-- Current Positions Tab -->
@@ -2704,4 +2843,44 @@ watch(showRebalanceModal, (val) => {
 
 <style scoped>
 @import '../styles/scoped-styles.css';
+
+.fetched-at-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: 50px;
+}
+
+.fetched-at-selector label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.fetched-at-select {
+  padding: 0.25rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background: white;
+  font-size: 0.8rem;
+  width: auto;
+  cursor: pointer;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.fetched-at-select:hover {
+  border-color: #80bdff;
+}
+
+.fetched-at-select:focus {
+  outline: 0;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.loading-indicator {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-style: italic;
+}
 </style>
