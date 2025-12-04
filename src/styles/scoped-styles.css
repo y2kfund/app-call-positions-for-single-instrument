@@ -106,7 +106,7 @@
   font-weight: 500;
   color: #666;
   transition: all 0.2s ease;
-  width: auto;
+  width: 75px;
 }
 
 .tab-button:hover {
