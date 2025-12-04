@@ -7,6 +7,7 @@ import { useTabulator } from '../composables/useTabulator'
 import { useAttachedData } from '../composables/useAttachedData'
 import { usePositionExpansion } from '../composables/usePositionExpansion'
 import { useRebalance, rebalanceEnabledStates, rebalanceSettingsData } from '../composables/useRebalance'
+import { useRentCalculation, type RentCalculation } from '../composables/useRentCalculation'
 import { TabulatorFull as Tabulator } from 'tabulator-tables'
 import RebalanceModal from '../components/RebalanceModal.vue'
 import OptimalRebalanceModal from '../components/OptimalRebalanceModal.vue'
@@ -105,6 +106,16 @@ const {
   openOptimalRebalanceModal,
   closeOptimalRebalanceModal
 } = useRebalance(getPositionKey, props.userId)
+
+// Use rent calculation composable
+const {
+  calculateRent,
+  prefetchTradeOpenDates,
+  getRentColor
+} = useRentCalculation()
+
+// Cache for rent calculations (keyed by position key)
+const rentCalculationsCache = ref<Map<string, RentCalculation>>(new Map())
 
 //const accountFilter = ref<string | null>(null)
 
@@ -790,48 +801,78 @@ const columns: ColumnDefinition[] = [
     field: 'rent_per_day_per_share', 
     hozAlign: 'right', 
     headerHozAlign: 'right',
-    widthGrow: 1.2,
+    widthGrow: 1.4,
     formatter: (cell: any) => {
       const row = cell.getRow().getData()
-      const entryCashFlow = row.computed_cash_flow_on_entry
-      const quantity = row.accounting_quantity
-      const dte = calculateDTE(row.symbol)
+      const positionKey = getPositionKey(row)
       
-      if (entryCashFlow == null || quantity == null || dte == null || dte === 0 || quantity === 0) {
+      // Check if we have cached calculation
+      const cachedCalc = rentCalculationsCache.value.get(positionKey)
+      
+      if (cachedCalc) {
+        const atEntryColor = getRentColor(cachedCalc.entryRentPerDayPerShare)
+        const currentColor = getRentColor(cachedCalc.currentRentPerDayPerShare)
+        
+        const atEntryValue = cachedCalc.entryRentPerDayPerShare != null 
+          ? `$${cachedCalc.entryRentPerDayPerShare.toFixed(2)}`
+          : 'N/A'
+        const currentValue = cachedCalc.currentRentPerDayPerShare != null 
+          ? `$${cachedCalc.currentRentPerDayPerShare.toFixed(2)}`
+          : 'N/A'
+        
+        return `<span style="cursor:context-menu;"><span style="color:${atEntryColor};">${atEntryValue}</span> / <span style="color:${currentColor};">${currentValue}</span></span>`
+      }
+      
+      // If no cache, trigger async calculation and show loading
+      const { conid, internal_account_id, symbol, computed_cash_flow_on_entry, market_value, accounting_quantity } = row
+      
+      if (!conid || !internal_account_id || !symbol) {
         return '<span style="color:#aaa;font-style:italic;">N/A</span>'
       }
       
-      // Premium per share = Entry Cash Flow / abs(Quantity)
-      const premiumPerShare = entryCashFlow / Math.abs(quantity)
+      // Trigger async calculation
+      calculateRent({
+        conid,
+        internal_account_id,
+        symbol,
+        computed_cash_flow_on_entry,
+        market_value,
+        accounting_quantity
+      }).then((calc) => {
+        rentCalculationsCache.value.set(positionKey, calc)
+        // Redraw just this cell
+        cell.getRow().reformat()
+      })
       
-      // Rent per day per share = Premium per share / DTE
-      const rentPerDayPerShare = premiumPerShare / dte
-      
-      const color = rentPerDayPerShare < 0 ? '#dc3545' : rentPerDayPerShare > 0 ? '#28a745' : '#000'
-      return `<span style="color:${color};cursor:context-menu;">$${Number(rentPerDayPerShare).toFixed(2)}</span>`
+      return '<span style="color:#aaa;font-style:italic;">Loading...</span>'
     },
-    cellContext: (e: any, cell: any) => {
+    cellContext: async (e: any, cell: any) => {
       e.preventDefault()
       
       const row = cell.getRow().getData()
-      const entryCashFlow = row.computed_cash_flow_on_entry
-      const quantity = row.accounting_quantity
-      const dte = calculateDTE(row.symbol)
+      const positionKey = getPositionKey(row)
       
-      if (entryCashFlow == null || quantity == null || dte == null || dte === 0 || quantity === 0) {
-        return
+      // Get or calculate rent data
+      let calc = rentCalculationsCache.value.get(positionKey)
+      
+      if (!calc) {
+        const { conid, internal_account_id, symbol, computed_cash_flow_on_entry, market_value, accounting_quantity } = row
+        calc = await calculateRent({
+          conid,
+          internal_account_id,
+          symbol,
+          computed_cash_flow_on_entry,
+          market_value,
+          accounting_quantity
+        })
+        rentCalculationsCache.value.set(positionKey, calc)
       }
       
-      const premiumPerShare = entryCashFlow / Math.abs(quantity)
-      const rentPerDayPerShare = premiumPerShare / dte
-      
-      // Set context menu position - position to the left of cursor
-      // Approximate menu width is 280px, so offset by that amount to show on left
-      const menuWidth = 280
+      // Set context menu position
+      const menuWidth = 350
       contextMenuX.value = Math.max(10, e.clientX - menuWidth)
       
-      // Adjust vertical position if too close to bottom
-      const menuHeight = 200 // approximate height
+      const menuHeight = 320
       const windowHeight = window.innerHeight
       if (e.clientY + menuHeight > windowHeight) {
         contextMenuY.value = Math.max(10, windowHeight - menuHeight - 10)
@@ -839,20 +880,57 @@ const columns: ColumnDefinition[] = [
         contextMenuY.value = e.clientY
       }
       
+      const formatCurrencyVal = (val: number | null) => val != null 
+        ? `$${Number(val).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` 
+        : 'N/A'
+      const formatDays = (val: number | null) => val != null ? `${val} days` : 'N/A'
+      
+      const atEntryColor = getRentColor(calc.entryRentPerDayPerShare)
+      const currentColor = getRentColor(calc.currentRentPerDayPerShare)
+      
       contextMenuContent.value = `<div style="padding: 12px;">
         <div style="font-weight: bold; margin-bottom: 10px; font-size: 14px;">📊 Rent per Day Calculation</div>
-        <div style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
-          <div><strong>Entry Cash Flow:</strong> $${Number(entryCashFlow).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-          <div><strong>Quantity:</strong> ${Math.abs(quantity).toLocaleString()}</div>
-          <div><strong>DTE:</strong> ${dte} days</div>
+        
+        <div style="margin-bottom: 12px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+          <div><strong>Entry Cash Flow:</strong> ${formatCurrencyVal(calc.entryCashFlow)}</div>
+          <div><strong>Market Value:</strong> ${formatCurrencyVal(calc.marketValue)}</div>
+          <div><strong>Quantity:</strong> ${calc.accountingQuantity != null ? Math.abs(calc.accountingQuantity).toLocaleString() : 'N/A'}</div>
+          <div><strong>Trade Open Date:</strong> ${calc.tradeOpenDate || 'N/A'}</div>
+          <div><strong>Expiry Date:</strong> ${calc.expiryDate || 'N/A'}</div>
         </div>
-        <div style="margin-bottom: 6px;">
-          <strong>Step 1:</strong> Premium per share<br>
-          <span style="font-family: monospace;">$${Number(entryCashFlow).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ÷ ${Math.abs(quantity).toLocaleString()} = <strong>$${Number(premiumPerShare).toFixed(2)}</strong></span>
+        
+        <div style="display: flex; gap: 16px;">
+          <div style="flex: 1; padding: 8px; background: #e8f5e9; border-radius: 4px;">
+            <div style="font-weight: bold; margin-bottom: 6px; color: #2e7d32;">📅 At Entry</div>
+            <div style="font-size: 11px; margin-bottom: 4px;">
+              <strong>Total Days:</strong> ${formatDays(calc.totalDaysAtEntry)}<br>
+              <span style="color: #666;">(${calc.tradeOpenDate || '?'} → ${calc.expiryDate || '?'})</span>
+            </div>
+            <div style="font-size: 11px; margin-bottom: 4px;">
+              <strong>Premium/Share:</strong> ${formatCurrencyVal(calc.entryPremiumPerShare)}
+            </div>
+            <div style="font-size: 12px;">
+              <strong>Rent/Day:</strong> <span style="color:${atEntryColor};font-weight:bold;">${formatCurrencyVal(calc.entryRentPerDayPerShare)}</span>
+            </div>
+          </div>
+          
+          <div style="flex: 1; padding: 8px; background: #e3f2fd; border-radius: 4px;">
+            <div style="font-weight: bold; margin-bottom: 6px; color: #1565c0;">⏱️ Current</div>
+            <div style="font-size: 11px; margin-bottom: 4px;">
+              <strong>DTE:</strong> ${formatDays(calc.currentDTE)}
+            </div>
+            <div style="font-size: 11px; margin-bottom: 4px;">
+              <strong>Premium/Share:</strong> ${formatCurrencyVal(calc.currentPremiumPerShare)}
+            </div>
+            <div style="font-size: 12px;">
+              <strong>Rent/Day:</strong> <span style="color:${currentColor};font-weight:bold;">${formatCurrencyVal(calc.currentRentPerDayPerShare)}</span>
+            </div>
+          </div>
         </div>
-        <div>
-          <strong>Step 2:</strong> Rent per day per share<br>
-          <span style="font-family: monospace;">$${Number(premiumPerShare).toFixed(2)} ÷ ${dte} days = <strong style="color: #28a745;">$${Number(rentPerDayPerShare).toFixed(2)}</strong></span>
+        
+        <div style="margin-top: 10px; font-size: 10px; color: #666; border-top: 1px solid #ddd; padding-top: 8px;">
+          <div><strong>At Entry Formula:</strong> (Entry Cash Flow ÷ |Qty|) ÷ Total Days</div>
+          <div><strong>Current Formula:</strong> (Market Value ÷ |Qty|) ÷ Current DTE</div>
         </div>
       </div>`
       showContextMenu.value = true
@@ -2471,6 +2549,22 @@ function formatSettleDateTarget(dateStr: string): string {
 watch([q.isSuccess, () => q.data.value], async ([success, dataValue]) => {
   if (success && dataValue && dataValue.length > 0 && tableDiv.value && !isTableInitialized.value) {
     await nextTick()
+    
+    // Prefetch trade open dates for rent calculation
+    const positionsForPrefetch = dataValue
+      .filter((p: any) => p.conid && p.internal_account_id)
+      .map((p: any) => ({ conid: p.conid, internal_account_id: p.internal_account_id }))
+    
+    if (positionsForPrefetch.length > 0) {
+      prefetchTradeOpenDates(positionsForPrefetch).then(() => {
+        // Clear and recalculate rent for all positions
+        rentCalculationsCache.value.clear()
+        if (tabulator.value) {
+          tabulator.value.redraw(true)
+        }
+      })
+    }
+    
     initializeTabulator()
   }
 }, { immediate: true })
