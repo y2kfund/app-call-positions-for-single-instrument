@@ -18,7 +18,7 @@ interface callPositionsProps {
 }
 
 const props = withDefaults(defineProps<callPositionsProps>(), {
-  symbolRoot: 'META',
+  symbolRoot: 'MSFT',
   userId: '67e578fd-2cf7-48a4-b028-a11a3f89bb9b'
 })
 
@@ -293,13 +293,22 @@ function calculateDTE(symbolText: string): number | null {
   const expiryDateStr = tags[1] // YYYY-MM-DD format
   if (!expiryDateStr) return null
   
-  const expiryDate = new Date(expiryDateStr)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  expiryDate.setHours(0, 0, 0, 0)
+  // Parse expiry date manually to avoid timezone issues
+  const [year, month, day] = expiryDateStr.split('-').map(Number)
+  if (!year || !month || !day) return null
   
-  const diffTime = expiryDate.getTime() - today.getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  // Get today's date in California timezone (America/Los_Angeles)
+  const californiaDate = new Date().toLocaleDateString('en-CA', { 
+    timeZone: 'America/Los_Angeles' 
+  }) // Returns YYYY-MM-DD format
+  const [todayYear, todayMonth, todayDay] = californiaDate.split('-').map(Number)
+  
+  // Create dates at midnight for comparison (using UTC to avoid any local timezone shifts)
+  const expiryMs = Date.UTC(year, month - 1, day)
+  const todayMs = Date.UTC(todayYear, todayMonth - 1, todayDay)
+  
+  const diffMs = expiryMs - todayMs
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24))
   
   return diffDays
 }
@@ -611,7 +620,7 @@ const columns: ColumnDefinition[] = [
         else if (dte <= 30) color = '#ffc107' // Yellow for <= 30 days
         else color = '#28a745' // Green for > 30 days
         
-        return `<span style="color:${color};font-weight:${dte <= 7 ? 'bold' : 'normal'}">${dte}</span>`
+        return `<span style="color:${color};font-weight:${dte <= 7 ? 'bold' : 'normal'};cursor:context-menu;" title="Right-click for calculation details">${dte}</span>`
       }
       return '<span style="color:#aaa;font-style:italic;">N/A</span>'
     },
@@ -627,6 +636,78 @@ const columns: ColumnDefinition[] = [
       if (bDTE === null) return -1
       
       return aDTE - bDTE
+    },
+    cellContext: (e: any, cell: any) => {
+      e.preventDefault()
+      
+      const row = cell.getRow().getData()
+      if (row.asset_class !== 'OPT') return
+      
+      const tags = extractTagsFromSymbol(row.symbol)
+      const expiryDateStr = tags[1]
+      if (!expiryDateStr) return
+      
+      // Get today's date in California timezone
+      const californiaDate = new Date().toLocaleDateString('en-CA', { 
+        timeZone: 'America/Los_Angeles' 
+      })
+      
+      const dte = calculateDTE(row.symbol)
+      
+      // Determine status
+      let status = ''
+      let statusColor = ''
+      if (dte === null) {
+        status = 'Unknown'
+        statusColor = '#aaa'
+      } else if (dte < 0) {
+        status = 'EXPIRED'
+        statusColor = '#dc3545'
+      } else if (dte === 0) {
+        status = 'EXPIRES TODAY'
+        statusColor = '#dc3545'
+      } else if (dte <= 7) {
+        status = 'Expiring Soon'
+        statusColor = '#fd7e14'
+      } else if (dte <= 30) {
+        status = 'Within 30 Days'
+        statusColor = '#ffc107'
+      } else {
+        status = 'Safe'
+        statusColor = '#28a745'
+      }
+      
+      // Position context menu
+      const menuWidth = 320
+      contextMenuX.value = Math.max(10, e.clientX - menuWidth)
+      
+      const menuHeight = 200
+      const windowHeight = window.innerHeight
+      if (e.clientY + menuHeight > windowHeight) {
+        contextMenuY.value = Math.max(10, windowHeight - menuHeight - 10)
+      } else {
+        contextMenuY.value = e.clientY
+      }
+      
+      contextMenuContent.value = `<div style="padding: 12px;">
+        <div style="font-weight: bold; margin-bottom: 10px; font-size: 14px;">📅 DTE Calculation</div>
+        
+        <div style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="color: #666;">Today (PST):</span>
+            <span>${californiaDate}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="color: #666;">Expiry Date:</span>
+            <span>${expiryDateStr}</span>
+          </div>
+          <div style="border-top: 1px solid #dee2e6; margin: 8px 0; padding-top: 8px; display: flex; justify-content: space-between;">
+            <span style="color: #666;">Days to Expiry:</span>
+            <span>${dte !== null ? dte : 'N/A'}</span>
+          </div>
+        </div>       
+      </div>`
+      showContextMenu.value = true
     }
   },
   { 
